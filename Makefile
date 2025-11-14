@@ -1,17 +1,17 @@
-CC :=gcc
+CC :=g++
 
 FLAGS := -Wall -Wextra
 LDFLAGS := -lm
-SRC := $(wildcard *.c)
-OBJECTS := $(SRC:.c=.o)
+SRC := $(wildcard *.cpp)
+OBJECTS := $(SRC:.cpp=.o)
 BUILD_DIR:=build
 OBJECTS:=$(addprefix $(BUILD_DIR)/,$(OBJECTS))
-TARGET :=echopulse
+TARGET :=main
 
 all:clean $(TARGET) 
 $(TARGET):$(OBJECTS)
 			$(CC) -o $@ $^ $(LDFLAGS)
-$(BUILD_DIR)/%.o:%.c
+$(BUILD_DIR)/%.o:%.cpp
 						mkdir -p $(BUILD_DIR)
 						$(CC) $(FLAGS) -c $< -o $@
 
