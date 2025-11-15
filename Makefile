@@ -1,6 +1,6 @@
 CC :=g++
 
-FLAGS := -Wall -Wextra
+FLAGS := -Wall -Wextra -std=c++23
 LDFLAGS := -lm
 SRC := $(wildcard *.cpp)
 OBJECTS := $(SRC:.cpp=.o)

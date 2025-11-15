@@ -18,5 +18,4 @@ using i64=long int;
 using u64=unsigned long int;
 
 
-
 #endif
