@@ -54,7 +54,8 @@ int main(){
 
 
 
-     std::unique_ptr<i8[]> client_buffer(new i8[BUFFER]);
+     std::unique_ptr<i8[]> request_buffer(new i8[BUFFER]);
+     std::unique_ptr<i8[]> response_buffer(new i8[BUFFER]);
 
      while(1){
      i32 client_fd=accept(proxy_server_fd,(struct sockaddr*)&client_address,&socket_len);
@@ -64,7 +65,7 @@ int main(){
         exit(EXIT_FAILURE);
      }
 
-        ssize_t received_bytes=recv(client_fd,client_buffer.get(),BUFFER,0);
+        ssize_t received_bytes=recv(client_fd,request_buffer.get(),BUFFER,0);
         if(received_bytes==-1){
            std::cout<<"error "<<strerror(errno)<<"\n";
            exit(EXIT_FAILURE);
@@ -102,9 +103,21 @@ int main(){
            exit(EXIT_FAILURE);
       }
 
-        ssize_t sent_bytes=send(proxy_client_fd,client_buffer.get(),BUFFER,0);
+        ssize_t sent_bytes_to_server=send(proxy_client_fd,request_buffer.get(),BUFFER,0);
 
-        if(sent_bytes<0){
+        if(sent_bytes_to_server<0){
+           std::cout<<"error "<<strerror(errno)<<"\n";
+           exit(EXIT_FAILURE);
+        }
+
+        ssize_t received_bytes_from_server=recv(proxy_client_fd,response_buffer.get(),BUFFER,0);
+        if(received_bytes_from_server<0){
+           std::cout<<"error "<<strerror(errno)<<"\n";
+           exit(EXIT_FAILURE);
+        }
+
+        ssize_t sent_bytes_to_client=send(client_fd,response_buffer.get(),BUFFER,0);
+        if(sent_bytes_to_client<0){
            std::cout<<"error "<<strerror(errno)<<"\n";
            exit(EXIT_FAILURE);
         }
@@ -113,8 +126,7 @@ int main(){
      }
 
  
-
-
+    
 
      //close the server and client fds
 
