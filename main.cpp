@@ -1,10 +1,12 @@
 #include <iostream>
 #include "definitions.hpp"
+#include<sys/socket.h>
+#include<string.h>
 
 int main(){
-     std::cout<<"char "<<sizeof(i8)<<std::endl;
-     std::cout<<"short integer "<<sizeof(i16)<<std::endl;
-     std::cout<<"int "<<sizeof(i32)<<std::endl;
-     std::cout<<"long int "<<sizeof(i64)<<std::endl;
+     i32 proxy_fd=socket(AF_INET,SOCK_STREAM,0);
+     if(proxy_fd==-1){
+        std::cout<<"error "<<strerror(errno)<<"\n";
+     }
      return 0;
 }
