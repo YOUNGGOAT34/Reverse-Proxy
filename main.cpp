@@ -3,8 +3,10 @@
 #include<sys/socket.h>
 #include <netinet/in.h>
 #include<string.h>
+#include <memory>
 
 const auto PORT=4221;
+const auto BUFFER=4096;
 
 
 int main(){
@@ -47,9 +49,22 @@ int main(){
      struct sockaddr_storage client_address;
      socklen_t socket_len=sizeof(client_address);
 
-     accept(proxy_fd,(struct sockaddr*)&client_address,&socket_len);
+     i32 client_fd=accept(proxy_fd,(struct sockaddr*)&client_address,&socket_len);
 
+     if(client_fd==-1){
+        std::cout<<"error "<<strerror(errno)<<"\n";
+        exit(EXIT_FAILURE);
+     }
 
+     std::unique_ptr<i8[]> buffer(new i8[BUFFER]);
+     
+     ssize_t received_bytes=recv(client_fd,buffer.get(),BUFFER,0);
+     if(received_bytes==-1){
+        std::cout<<"error "<<strerror(errno)<<"\n";
+        exit(EXIT_FAILURE);
+     }
+
+     std::cout<<buffer.get()<<std::endl;
 
 
      return 0;
