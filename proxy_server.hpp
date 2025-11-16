@@ -8,8 +8,11 @@ class SERVER{
     //recv
     //send
 
+    private:
+          i32 prepare_server_socket(void);
+
     public:
-         void start_server();
+         void server();
 };
 
 
