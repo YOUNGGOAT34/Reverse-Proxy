@@ -125,12 +125,7 @@ int main(){
         break;
      }
 
- 
-    
 
      //close the server and client fds
-
-
-
      return 0;
 }
