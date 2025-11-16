@@ -8,7 +8,6 @@
         exit(EXIT_FAILURE);
      }
 
-
      struct sockaddr_in proxy_server_address;
      
      memset(&proxy_server_address,0,sizeof(proxy_server_address));
