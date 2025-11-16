@@ -7,5 +7,12 @@
 #include <sys/socket.h>
 #include <errno.h>
 
+class CLIENT{
+
+    //send
+    //recv
+
+};
+
 
 #endif
