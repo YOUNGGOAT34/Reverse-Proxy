@@ -1,7 +1,9 @@
 #ifndef PROXY_SERVER_H
 #define PROXY_SERVER_H
 
-#include "definitions.hpp"
+// #include "definitions.hpp"
+#include "utils.hpp"
+
 
 
 class SERVER{
@@ -9,10 +11,14 @@ class SERVER{
     //send
 
     private:
-          i32 prepare_server_socket(void);
+          //private members
+          UTILS utils;
+          //private member functions
+          void prepare_server_socket(i32 proxy_server_fd);
+          
 
     public:
-         void server();
+         void server(void);
 };
 
 

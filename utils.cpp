@@ -13,10 +13,10 @@ i32 UTILS::create_socket(void){
  }
 
 
- ssize_t UTILS::recv_(i32 fd,std::unique_ptr<i8[]> buffer){
+ ssize_t UTILS::recv_(i32 fd,std::unique_ptr<i8[]>& buffer){
       return recv(fd,buffer.get(),BUFFER,0);
  }
 
- ssize_t UTILS::send_(i32 fd,std::unique_ptr<i8[]> buffer){
+ ssize_t UTILS::send_(i32 fd,std::unique_ptr<i8[]>& buffer){
        return send(fd,buffer.get(),BUFFER,0);
  }
