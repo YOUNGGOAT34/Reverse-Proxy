@@ -2,14 +2,14 @@
 #define PROXY_SERVER_H
 
 #include "definitions.hpp"
-#include <stdlib.h>
-#include <string>
-#include <sys/socket.h>
-#include <errno.h>
+
 
 class SERVER{
     //recv
     //send
+
+    public:
+         void start_server();
 };
 
 

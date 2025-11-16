@@ -11,6 +11,8 @@ class CLIENT{
 
     //send
     //recv
+    public:
+         void start_client();
 
 };
 

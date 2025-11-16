@@ -1,6 +1,22 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
+#include <iostream>
+#include <stdlib.h>
+#include <string>
+#include <sys/socket.h>
+#include <errno.h>
+#include<sys/socket.h>
+#include <netinet/in.h>
+#include<string.h>
+#include <memory>
+
+
+
+const auto SERVER_PORT=4220;
+const auto CLIENT_PORT=4221;
+const auto BUFFER=4096;
+
 //bytes
 using i8=char;
 using u8=unsigned char;
