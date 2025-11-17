@@ -11,7 +11,8 @@ class CLIENT{
       //private functions
       void prepare_socket(i32 fd);
     public:
-         void client(std::unique_ptr<i8[]>& request_buffer,std::unique_ptr<i8[]>& response_buffer);
+         ssize_t bytes_recved;
+         void client(std::unique_ptr<i8[]>& request_buffer,std::unique_ptr<i8[]>& response_buffer,ssize_t& bytes);
 
 };
 

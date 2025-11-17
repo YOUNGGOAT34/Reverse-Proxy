@@ -18,6 +18,6 @@ i32 UTILS::create_socket(void){
       return recv(fd,buffer.get(),BUFFER,0);
  }
 
- ssize_t UTILS::send_(i32 fd,std::unique_ptr<i8[]>& buffer){
-       return send(fd,buffer.get(),BUFFER,0);
+ ssize_t UTILS::send_(i32 fd,std::unique_ptr<i8[]>& buffer,ssize_t& bytes){
+       return send(fd,buffer.get(),bytes,0);
  }

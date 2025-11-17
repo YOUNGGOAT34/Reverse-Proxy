@@ -1,6 +1,6 @@
 #include "proxy_client.hpp"
 
-void CLIENT::client(std::unique_ptr<i8[]>& request_buffer,std::unique_ptr<i8[]>& response_buffer){
+void CLIENT::client(std::unique_ptr<i8[]>& request_buffer,std::unique_ptr<i8[]>& response_buffer,ssize_t& bytes){
      
       i32 proxy_client_fd=utils.create_socket();
       FDGUARD guard(proxy_client_fd);
@@ -10,17 +10,17 @@ void CLIENT::client(std::unique_ptr<i8[]>& request_buffer,std::unique_ptr<i8[]>&
        }
 
          prepare_socket(proxy_client_fd);
-          
-        ssize_t sent_bytes_to_server=utils.send_(proxy_client_fd,request_buffer);
+         
+        ssize_t sent_bytes_to_server=utils.send_(proxy_client_fd,request_buffer,bytes);
         
         if(sent_bytes_to_server<0){
            std::cout<<"error "<<strerror(errno)<<"\n";
            exit(EXIT_FAILURE);
         }
 
-        ssize_t received_bytes_from_server=utils.recv_(proxy_client_fd,response_buffer);
+        bytes_recved=utils.recv_(proxy_client_fd,response_buffer);
         std::cout<<"Here"<< response_buffer.get()<<std::endl;
-        if(received_bytes_from_server<0){
+        if(bytes_recved<0){
            std::cout<<"error "<<strerror(errno)<<"\n";
            exit(EXIT_FAILURE);
         }
