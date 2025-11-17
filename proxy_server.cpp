@@ -30,7 +30,7 @@
 
        std::unique_ptr<i8[]> response_buffer(new i8[BUFFER]);
        std::unique_ptr<i8[]> request_buffer(new i8[BUFFER]);
-        while(1){    
+      
                   i32 client_fd=accept(proxy_server_fd,(struct sockaddr*)&client_address,&socket_len);
 
                   if(client_fd==-1){
@@ -54,10 +54,7 @@
         }
 
               proxy_client.client(request_buffer,response_buffer);
-                break;
 
-        }
-      
          
 
         
