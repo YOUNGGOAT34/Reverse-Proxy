@@ -7,14 +7,13 @@ i32 UTILS::create_socket(void){
  void UTILS::create_address(struct sockaddr_in& address,std::string client_or_server){
        memset(&address,0,sizeof(address));
 
-         address.sin_addr.s_addr=INADDR_ANY;
+         address.sin_addr.s_addr=htonl(client_or_server=="server"?INADDR_ANY:INADDR_LOOPBACK);
          address.sin_family=AF_INET;
          address.sin_port=client_or_server=="server"?htons(SERVER_PORT):htons(CLIENT_PORT);   
  }
 
 
  ssize_t UTILS::recv_(i32 fd,std::unique_ptr<i8[]>& buffer){
-     
       return recv(fd,buffer.get(),BUFFER,0);
  }
 

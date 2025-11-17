@@ -8,7 +8,7 @@
             exit(EXIT_FAILURE);
          }
 
-         FDGUARD guard(proxy_server_fd);
+         FDGUARD server_guard(proxy_server_fd);
 
          /*
             The function will bind,listen and accept connections
@@ -16,7 +16,6 @@
       prepare_server_socket(proxy_server_fd);
       struct sockaddr_storage client_address;
       socklen_t socket_len=sizeof(client_address);
-      
          /*
            At this point the proxy now should act as a client ,to send this request to the actual server
         */
@@ -28,7 +27,7 @@
             std::unique_ptr<i8[]> request_buffer(new i8[BUFFER]);
             
             i32 client_fd=accept(proxy_server_fd,(struct sockaddr*)&client_address,&socket_len);
-            FDGUARD guard(client_fd);
+            FDGUARD client_guard(client_fd);
             if(client_fd==-1){
                   std::cout<<"error "<<strerror(errno)<<"\n";
                   exit(EXIT_FAILURE);
