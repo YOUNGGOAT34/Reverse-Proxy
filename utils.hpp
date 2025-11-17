@@ -6,13 +6,13 @@ class UTILS{
    
    public:
          i32 create_socket(void);
-         void create_address(struct sockaddr_in& address);
+         void create_address(struct sockaddr_in& address,std::string client_or_server);
          ssize_t send_(i32 fd,std::unique_ptr<i8[]>& buffer);
          ssize_t recv_(i32 fd,std::unique_ptr<i8[]>& buffer);
 };
 
 struct FDGUARD{
-       i32 fd;
+       i32& fd;
 
        FDGUARD(i32& fd__):fd(fd__){}
 

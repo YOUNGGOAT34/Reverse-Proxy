@@ -24,35 +24,48 @@
            At this point the proxy now should act as a client ,to send this request to the actual server
         */
 
-       
+        i32 client_fd;
        while(true){
              
             std::unique_ptr<i8[]> response_buffer(new i8[BUFFER]);
             std::unique_ptr<i8[]> request_buffer(new i8[BUFFER]);
-           
-            i32 client_fd=accept(proxy_server_fd,(struct sockaddr*)&client_address,&socket_len);
+            
+            client_fd=accept(proxy_server_fd,(struct sockaddr*)&client_address,&socket_len);
             FDGUARD guard(client_fd);
             if(client_fd==-1){
                   std::cout<<"error "<<strerror(errno)<<"\n";
                   exit(EXIT_FAILURE);
             }
-       
            
-           ssize_t received_bytes=utils.recv_(proxy_server_fd,request_buffer);
+           ssize_t received_bytes=utils.recv_(client_fd,request_buffer);
            if(received_bytes==-1){
               std::cout<<"error"<<strerror(errno)<<"\n";
               exit(EXIT_FAILURE);
            }
+
+           if(received_bytes==0){
+               // continue;
+           }
    
    
+ 
+   
+           
+           proxy_client.client(request_buffer,response_buffer);
+          
+
+
             ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer);
             if(sent_bytes_to_client<0){
               std::cout<<"error "<<strerror(errno)<<"\n";
               exit(EXIT_FAILURE);
            }
-   
-            proxy_client.client(request_buffer,response_buffer);
+
+           break;
+            
          }
+
+         
 
     
  }
@@ -62,7 +75,7 @@
    
          struct sockaddr_in proxy_server_address;
 
-         utils.create_address(proxy_server_address);
+         utils.create_address(proxy_server_address,"server");
 
 
          if(bind(proxy_server_fd,(const sockaddr*)&proxy_server_address,sizeof(proxy_server_address))==-1){
