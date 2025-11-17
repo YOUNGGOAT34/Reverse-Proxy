@@ -19,7 +19,6 @@ void CLIENT::client(std::unique_ptr<i8[]>& request_buffer,std::unique_ptr<i8[]>&
         }
 
         bytes_recved=utils.recv_(proxy_client_fd,response_buffer);
-        std::cout<<"Here"<< response_buffer.get()<<std::endl;
         if(bytes_recved<0){
            std::cout<<"error "<<strerror(errno)<<"\n";
            exit(EXIT_FAILURE);
