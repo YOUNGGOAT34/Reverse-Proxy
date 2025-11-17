@@ -14,9 +14,24 @@ i32 UTILS::create_socket(void){
 
 
  ssize_t UTILS::recv_(i32 fd,std::unique_ptr<i8[]>& buffer){
+      ssize_t received_bytes=0;
+
+      while(received_bytes<)
+
       return recv(fd,buffer.get(),BUFFER,0);
  }
 
  ssize_t UTILS::send_(i32 fd,std::unique_ptr<i8[]>& buffer,ssize_t& bytes){
-       return send(fd,buffer.get(),bytes,0);
+       ssize_t sent_bytes=0;
+
+       while(sent_bytes<bytes){
+             ssize_t sent=send(fd,buffer.get(),bytes,0);
+             if(sent<=0){
+                return -1;
+             }
+
+             sent_bytes+=sent;
+       }
+       return sent_bytes;
+       
  }

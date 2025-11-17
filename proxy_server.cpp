@@ -1,5 +1,12 @@
 #include "proxy_server.hpp"
 
+
+/*
+   looped recv and send
+   read host from the http header
+   http parsing
+*/
+
  void SERVER::server(void){
 
          i32 proxy_server_fd= utils.create_socket();
