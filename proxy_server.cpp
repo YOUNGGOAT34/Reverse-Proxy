@@ -13,12 +13,7 @@
          /*
             The function will bind,listen and accept connections
          */
-        prepare_server_socket(proxy_server_fd);
-       
- 
-   
-
-       
+      prepare_server_socket(proxy_server_fd);
       struct sockaddr_storage client_address;
       socklen_t socket_len=sizeof(client_address);
       

@@ -12,9 +12,9 @@ class UTILS{
 };
 
 struct FDGUARD{
-       i32& fd;
+       i32 fd;
         
-       FDGUARD(i32& fd__):fd(fd__){}
+       FDGUARD(i32 fd__):fd(fd__){}
 
        ~FDGUARD(){
             if(fd>=0){
