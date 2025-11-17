@@ -17,7 +17,10 @@ struct FDGUARD{
        FDGUARD(i32& fd__):fd(fd__){}
 
        ~FDGUARD(){
-            close(fd);
+            if(fd>=0){
+
+                  close(fd);
+            }
        }
 };
 
