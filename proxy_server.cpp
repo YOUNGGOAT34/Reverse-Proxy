@@ -24,19 +24,20 @@
            At this point the proxy now should act as a client ,to send this request to the actual server
         */
 
-       std::unique_ptr<i8[]> response_buffer(new i8[BUFFER]);
-       std::unique_ptr<i8[]> request_buffer(new i8[BUFFER]);
-      
-         i32 client_fd=accept(proxy_server_fd,(struct sockaddr*)&client_address,&socket_len);
-
-         while(true){
-
+       
+       while(true){
+             
+            std::unique_ptr<i8[]> response_buffer(new i8[BUFFER]);
+            std::unique_ptr<i8[]> request_buffer(new i8[BUFFER]);
+           
+            i32 client_fd=accept(proxy_server_fd,(struct sockaddr*)&client_address,&socket_len);
+            FDGUARD guard(client_fd);
             if(client_fd==-1){
                   std::cout<<"error "<<strerror(errno)<<"\n";
                   exit(EXIT_FAILURE);
             }
        
-   
+           
            ssize_t received_bytes=utils.recv_(proxy_server_fd,request_buffer);
            if(received_bytes==-1){
               std::cout<<"error"<<strerror(errno)<<"\n";

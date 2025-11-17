@@ -11,4 +11,14 @@ class UTILS{
          ssize_t recv_(i32 fd,std::unique_ptr<i8[]>& buffer);
 };
 
+struct FDGUARD{
+       i32 fd;
+
+       FDGUARD(i32& fd__):fd(fd__){}
+
+       ~FDGUARD(){
+            close(fd);
+       }
+};
+
 #endif
