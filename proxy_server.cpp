@@ -65,7 +65,7 @@
    
          struct sockaddr_in proxy_server_address;
 
-         utils.create_address(proxy_server_address,"server");
+         utils.create_address(proxy_server_address,AddressType::Server);
 
 
          if(bind(proxy_server_fd,(const sockaddr*)&proxy_server_address,sizeof(proxy_server_address))==-1){

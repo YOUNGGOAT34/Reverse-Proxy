@@ -29,7 +29,7 @@ void CLIENT::client(std::unique_ptr<i8[]>& request_buffer,std::unique_ptr<i8[]>&
 
 void CLIENT::prepare_socket(i32 fd){
        struct sockaddr_in proxy_client_address;
-       utils.create_address(proxy_client_address,"client");
+       utils.create_address(proxy_client_address,AddressType::Client);
       i32 connection_status=connect(fd,(struct sockaddr *)&proxy_client_address,sizeof(proxy_client_address));
       if(connection_status==-1){
            std::cout<<"error "<<strerror(errno)<<"\n";

@@ -4,12 +4,12 @@ i32 UTILS::create_socket(void){
      return socket(AF_INET,SOCK_STREAM,0);
 }
 
- void UTILS::create_address(struct sockaddr_in& address,std::string client_or_server){
+ void UTILS::create_address(struct sockaddr_in& address,AddressType addr_type){
        memset(&address,0,sizeof(address));
 
-         address.sin_addr.s_addr=htonl(client_or_server=="server"?INADDR_ANY:INADDR_LOOPBACK);
+         address.sin_addr.s_addr=htonl(addr_type==AddressType::Server?INADDR_ANY:INADDR_LOOPBACK);
          address.sin_family=AF_INET;
-         address.sin_port=client_or_server=="server"?htons(SERVER_PORT):htons(CLIENT_PORT);   
+         address.sin_port=htons(addr_type==AddressType::Server?SERVER_PORT:CLIENT_PORT);   
  }
 
 

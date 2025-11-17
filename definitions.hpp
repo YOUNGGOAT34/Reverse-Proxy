@@ -34,5 +34,9 @@ using u32=unsigned int;
 using i64=long int;
 using u64=unsigned long int;
 
+enum class AddressType{
+      Server,
+      Client
+};
 
 #endif
