@@ -13,13 +13,13 @@ class CLIENT{
       std::string response;
       
       //private functions
-      std::string read_headers();
-      std::string read_body(std::string& body);
+
       void prepare_socket();
     public:
          CLIENT();
-         void client(std::unique_ptr<i8[]>& request_buffer,std::unique_ptr<i8[]>& response_buffer,ssize_t& bytes);
+         void client(std::string& request_buffer,ssize_t& bytes);
          ssize_t get_bytes_received();
+         std::string& get_response();
          
 
 };

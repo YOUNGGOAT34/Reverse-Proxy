@@ -13,19 +13,120 @@ i32 UTILS::create_socket(void){
  }
 
 
- ssize_t UTILS::recv_(i32 fd,std::unique_ptr<i8[]>& buffer){
-     /*
-     TO DO:
-     looped receive
-     */
-      return recv(fd,buffer.get(),BUFFER,0);
+ ssize_t UTILS::recv_(i32 fd,std::string& buffer){
+      std::string headers=read_headers(fd);
+      std::string body=read_body(fd,headers);
+      std::string res=headers+body;
+      buffer=std::move(res);
+
+      return bytes_received;
+
  }
 
- ssize_t UTILS::send_(i32 fd,std::unique_ptr<i8[]>& buffer,const ssize_t& bytes){
+
+
+std::string  UTILS::read_headers(i32 fd){
+     i8 buffer[BUFFER]={0};
+     std::string request_data;
+     while(true){
+         ssize_t received_bytes=recv(fd,buffer,BUFFER,0);
+         if(received_bytes>0){
+             bytes_received+=received_bytes;
+             request_data.append(buffer,received_bytes);
+             if(request_data.find("\r\n\r\n")!=std::string::npos){
+                 break;
+             }
+
+             continue;
+         }else if(received_bytes==0){
+             break;
+         }else if(received_bytes<0){
+
+                 if(errno==EAGAIN || errno==EWOULDBLOCK){
+                     
+                      break;
+                   }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
+          
+                         break;
+                }
+         }
+        
+     }
+
+     return request_data;
+    
+}
+
+
+std::string UTILS::read_body(i32 fd,std::string& headers){
+    i8 buffer[BUFFER]={0};
+    std::string body;
+    //find content length
+    size_t content_len_start=headers.find("Content-Length:");
+    if(content_len_start==std::string::npos){
+       return "";
+    }
+    size_t content_len_end=headers.find("\r\n",content_len_start);
+
+    if(content_len_end==std::string::npos){
+       return "";
+    }
+
+
+    std::string content_len_string=headers.substr(content_len_start+strlen("Content-Length:"),content_len_end-(content_len_start+strlen("Content-Length:")));
+   
+    while(!content_len_string.empty()&&isspace(content_len_string.front())){
+           content_len_string.erase(content_len_string.begin());
+    }
+
+
+     size_t content_len=std::strtoul(content_len_string.c_str(),NULL,10);
+
+    size_t headers_end=headers.find("\r\n\r\n");
+      if(headers_end!=std::string::npos){
+         size_t body_start=headers_end+4;
+
+       if(headers.size()>body_start){
+          body=headers.substr(body_start);
+       }
+    
+    }
+
+    
+
+
+    while(body.size()<content_len){
+           ssize_t bytes_received=recv(fd,buffer,BUFFER,0);
+
+           if(bytes_received>0){
+                this->bytes_received+=bytes_received;
+                body.append(buffer,bytes_received);
+                continue;
+           }else if(bytes_received==0){
+             break;
+         }else if(bytes_received<0){
+
+                 if(errno==EAGAIN || errno==EWOULDBLOCK){
+                     
+                      break;
+                   }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
+          
+                         break;
+                }
+         }
+    }
+
+
+
+    return body;
+}
+
+
+ ssize_t UTILS::send_(i32 fd,std::string& buffer,const ssize_t& bytes){
        ssize_t sent_bytes=0;
       
        while(sent_bytes<=bytes){
-             ssize_t sent=send(fd,buffer.get()+sent_bytes,bytes,0);
+             ssize_t sent=send(fd,buffer.c_str()+sent_bytes,bytes,0);
              if(sent<=0){
                 return -1;
              }

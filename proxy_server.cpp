@@ -27,11 +27,11 @@
            At this point the proxy now should act as a client ,to send this request to the actual server
         */
 
-        
+   
        while(true){
              
-            std::unique_ptr<i8[]> response_buffer(new i8[BUFFER]);
-            std::unique_ptr<i8[]> request_buffer(new i8[BUFFER]);
+            std::string request_buffer;
+            
             
             i32 client_fd=accept(proxy_server_fd,(struct sockaddr*)&client_address,&socket_len);
             FDGUARD client_guard(client_fd);
@@ -50,7 +50,8 @@
                // continue;
            }
               
-            proxy_client.client(request_buffer,response_buffer,received_bytes);
+            proxy_client.client(request_buffer,received_bytes);
+            std::string response_buffer=proxy_client.get_response();
             ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,proxy_client.get_bytes_received());
             if(sent_bytes_to_client<0){
               std::cout<<"error "<<strerror(errno)<<"\n";
