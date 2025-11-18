@@ -2,9 +2,10 @@
 
 
 /*
-   looped recv and send
+  
    error handling ....
-   http parsing
+   destructor for client class
+ 
 */
 
  void SERVER::server(void){
@@ -14,6 +15,10 @@
             std::cout<<"error "<<strerror(errno)<<"\n";
             exit(EXIT_FAILURE);
          }
+
+          i32 opt=1;
+
+         setsockopt(proxy_server_fd,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));
          
          FDGUARD server_guard(proxy_server_fd);
 
@@ -31,8 +36,7 @@
        while(true){
              
             std::string request_buffer;
-            
-            
+
             i32 client_fd=accept(proxy_server_fd,(struct sockaddr*)&client_address,&socket_len);
             FDGUARD client_guard(client_fd);
             if(client_fd==-1){
@@ -52,7 +56,6 @@
               
             proxy_client.client(request_buffer,received_bytes);
             std::string response_buffer=proxy_client.get_response();
-            std::cout<<proxy_client.get_bytes_received()<<std::endl;
             ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,proxy_client.get_bytes_received());
             if(sent_bytes_to_client<0){
               std::cout<<"error "<<strerror(errno)<<"\n";
