@@ -9,7 +9,7 @@ class CLIENT{
       //private members
       UTILS utils;
       i32 proxy_client_fd;
-      ssize_t bytes_recved=0;
+      ssize_t bytes_recved;
       std::string response;
       
       //private functions

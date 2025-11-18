@@ -52,12 +52,13 @@
               
             proxy_client.client(request_buffer,received_bytes);
             std::string response_buffer=proxy_client.get_response();
+            std::cout<<proxy_client.get_bytes_received()<<std::endl;
             ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,proxy_client.get_bytes_received());
             if(sent_bytes_to_client<0){
               std::cout<<"error "<<strerror(errno)<<"\n";
               exit(EXIT_FAILURE);
            }
-
+           
            break;
             
          }

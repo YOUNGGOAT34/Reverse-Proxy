@@ -1,6 +1,6 @@
 #include "proxy_client.hpp"
 
-CLIENT::CLIENT(){
+CLIENT::CLIENT():proxy_client_fd(0){
      proxy_client_fd=utils.create_socket();
       if(proxy_client_fd==-1){
            std::cout<<"error "<<strerror(errno)<<"\n";

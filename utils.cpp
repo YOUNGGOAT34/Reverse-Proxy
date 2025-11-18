@@ -14,11 +14,12 @@ i32 UTILS::create_socket(void){
 
 
  ssize_t UTILS::recv_(i32 fd,std::string& buffer){
+
       std::string headers=read_headers(fd);
       std::string body=read_body(fd,headers);
       std::string res=headers+body;
       buffer=std::move(res);
-
+    
       return bytes_received;
 
  }
