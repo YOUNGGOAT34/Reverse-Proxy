@@ -126,9 +126,10 @@ std::string UTILS::read_body(i32 fd,std::string& headers){
  ssize_t UTILS::send_(i32 fd,std::string& buffer,const ssize_t& bytes){
        ssize_t sent_bytes=0;
       
-       while(sent_bytes<=bytes){
-             ssize_t sent=send(fd,buffer.c_str()+sent_bytes,bytes,0);
+       while(sent_bytes<bytes){
+             ssize_t sent=send(fd,buffer.c_str()+sent_bytes,bytes-sent_bytes,0);
              if(sent<=0){
+              
                 return -1;
              }
 
