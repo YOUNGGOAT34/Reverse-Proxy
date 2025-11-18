@@ -21,7 +21,7 @@ i32 UTILS::create_socket(void){
       return recv(fd,buffer.get(),BUFFER,0);
  }
 
- ssize_t UTILS::send_(i32 fd,std::unique_ptr<i8[]>& buffer,ssize_t& bytes){
+ ssize_t UTILS::send_(i32 fd,std::unique_ptr<i8[]>& buffer,const ssize_t& bytes){
        ssize_t sent_bytes=0;
       
        while(sent_bytes<=bytes){

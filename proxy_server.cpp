@@ -3,7 +3,7 @@
 
 /*
    looped recv and send
-   read host from the http header
+   error handling ....
    http parsing
 */
 
@@ -14,7 +14,7 @@
             std::cout<<"error "<<strerror(errno)<<"\n";
             exit(EXIT_FAILURE);
          }
-
+         
          FDGUARD server_guard(proxy_server_fd);
 
          /*
@@ -51,7 +51,7 @@
            }
               
             proxy_client.client(request_buffer,response_buffer,received_bytes);
-            ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,proxy_client.bytes_recved);
+            ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,proxy_client.get_bytes_received());
             if(sent_bytes_to_client<0){
               std::cout<<"error "<<strerror(errno)<<"\n";
               exit(EXIT_FAILURE);
