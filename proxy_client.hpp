@@ -17,6 +17,7 @@ class CLIENT{
       void prepare_socket();
     public:
          CLIENT();
+         ~CLIENT();
          void client(std::string& request_buffer,ssize_t& bytes);
          ssize_t get_bytes_received();
          std::string& get_response();

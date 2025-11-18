@@ -8,6 +8,10 @@ CLIENT::CLIENT():proxy_client_fd(0){
        }
 }
 
+CLIENT::~CLIENT(){
+    close(proxy_client_fd);
+}
+
 void CLIENT::client(std::string& request_buffer,ssize_t& bytes){
      
          prepare_socket();
