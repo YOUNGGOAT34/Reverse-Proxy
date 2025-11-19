@@ -2,6 +2,7 @@
 #define PROXY_CLIENT_H
 
 #include "utils.hpp"
+#include "exceptions.hpp"
 
 
 class CLIENT{

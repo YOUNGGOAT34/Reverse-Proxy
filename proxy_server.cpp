@@ -9,61 +9,68 @@
 
  void SERVER::server(void){
 
-         i32 proxy_server_fd= utils.create_socket();
-         if(proxy_server_fd==-1){
-            std::cout<<"error "<<strerror(errno)<<"\n";
-            exit(EXIT_FAILURE);
-         }
 
-          i32 opt=1;
+         try{
 
-         setsockopt(proxy_server_fd,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));
-         
-         FDGUARD server_guard(proxy_server_fd);
-
-         /*
-            The function will bind,listen and accept connections
-         */
-      prepare_server_socket(proxy_server_fd);
-      struct sockaddr_storage client_address;
-      socklen_t socket_len=sizeof(client_address);
-         /*
-           At this point the proxy now should act as a client ,to send this request to the actual server
-        */
-
-   
-       while(true){
-             
-            std::string request_buffer;
-
-            i32 client_fd=accept(proxy_server_fd,(struct sockaddr*)&client_address,&socket_len);
-            FDGUARD client_guard(client_fd);
-            if(client_fd==-1){
-                  std::cout<<"error "<<strerror(errno)<<"\n";
-                  exit(EXIT_FAILURE);
+            i32 proxy_server_fd= utils.create_socket();
+            if(proxy_server_fd==-1){
+               std::cout<<"error "<<strerror(errno)<<"\n";
+               exit(EXIT_FAILURE);
             }
-           
-           ssize_t received_bytes=utils.recv_(client_fd,request_buffer);
-           if(received_bytes==-1){
-              std::cout<<"error"<<strerror(errno)<<"\n";
-              exit(EXIT_FAILURE);
-           }
-
-           if(received_bytes==0){
-               // continue;
-           }
-              
-            proxy_client.client(request_buffer,received_bytes);
-            std::string response_buffer=proxy_client.get_response();
-            ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,proxy_client.get_bytes_received());
-            if(sent_bytes_to_client<0){
-              std::cout<<"error "<<strerror(errno)<<"\n";
-              exit(EXIT_FAILURE);
-           }
-           
-           break;
+   
+             i32 opt=1;
+   
+            setsockopt(proxy_server_fd,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));
             
+            FDGUARD server_guard(proxy_server_fd);
+   
+            /*
+               The function will bind,listen and accept connections
+            */
+         prepare_server_socket(proxy_server_fd);
+         struct sockaddr_storage client_address;
+         socklen_t socket_len=sizeof(client_address);
+            /*
+              At this point the proxy now should act as a client ,to send this request to the actual server
+           */
+   
+      
+          while(true){
+                
+               std::string request_buffer;
+   
+               i32 client_fd=accept(proxy_server_fd,(struct sockaddr*)&client_address,&socket_len);
+               FDGUARD client_guard(client_fd);
+               if(client_fd==-1){
+                     std::cout<<"error "<<strerror(errno)<<"\n";
+                     exit(EXIT_FAILURE);
+               }
+              
+              ssize_t received_bytes=utils.recv_(client_fd,request_buffer);
+              if(received_bytes==-1){
+                 std::cout<<"error"<<strerror(errno)<<"\n";
+                 exit(EXIT_FAILURE);
+              }
+   
+              if(received_bytes==0){
+                  // continue;
+              }
+                 
+               proxy_client.client(request_buffer,received_bytes);
+               std::string response_buffer=proxy_client.get_response();
+               ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,proxy_client.get_bytes_received());
+               if(sent_bytes_to_client<0){
+                 std::cout<<"error "<<strerror(errno)<<"\n";
+                 exit(EXIT_FAILURE);
+              }
+              
+              break;
+               
+            }
+         }catch(const ServerException& e){
+               //  std::cerr<<R
          }
+
 
     
  }

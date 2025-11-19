@@ -39,4 +39,11 @@ enum class AddressType{
       Client
 };
 
+
+constexpr auto RED=   "\033[1;31m";
+constexpr auto GREEN=   "\033[1;32m";
+constexpr auto YELLOW= "\033[1;33m";
+constexpr auto RESET ="\033[0m";
+constexpr auto WHITE= "\033[1;37m";
+
 #endif
