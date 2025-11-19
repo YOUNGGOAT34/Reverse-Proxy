@@ -17,9 +17,9 @@
                std::cout<<"error "<<strerror(errno)<<"\n";
                exit(EXIT_FAILURE);
             }
-   
+
              i32 opt=1;
-   
+
             setsockopt(proxy_server_fd,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));
             
             FDGUARD server_guard(proxy_server_fd);
@@ -27,6 +27,7 @@
             /*
                The function will bind,listen and accept connections
             */
+
          prepare_server_socket(proxy_server_fd);
          struct sockaddr_storage client_address;
          socklen_t socket_len=sizeof(client_address);
@@ -68,11 +69,18 @@
                
             }
          }catch(const ServerException& e){
-               //  std::cerr<<R
+                std::cerr<<RED<<e.what()<<RESET<<"\n";
+         }catch(const NetworkException& e){
+                std::cerr<<RED<<e.what()<<RESET<<"\n";
+         }catch(const ProxyException& e){
+               std::cerr<<RED<<e.what()<<RESET<<"\n";
+         }catch(const SystemFailureException& e){
+              std::cerr<<RED<<e.what()<<RESET<<"\n";
+              exit(EXIT_FAILURE);
+         }catch(...){
+              std::cerr<<RED<<"Unhandled exception"<<RESET<<"\n";
          }
 
-
-    
  }
 
 
@@ -84,16 +92,14 @@
 
 
          if(bind(proxy_server_fd,(const sockaddr*)&proxy_server_address,sizeof(proxy_server_address))==-1){
-               std::cout<<"error "<<strerror(errno)<<"\n";
-               exit(EXIT_FAILURE);
+                throw ProxyException("Proxy Server exception: " + std::string(strerror(errno)));
           }
 
         i32 backlog=100;
 
 
        if(listen(proxy_server_fd,backlog)==-1){
-            std::cout<<"error "<<strerror(errno)<<"\n";
-            exit(EXIT_FAILURE);
+             throw ProxyException("Proxy Server exception: " + std::string(strerror(errno)));
        }
 
 
