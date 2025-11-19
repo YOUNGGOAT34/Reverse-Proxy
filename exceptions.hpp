@@ -8,7 +8,9 @@ class ServerException:public std::runtime_error{
 };
 
 class NetworkException:public std::runtime_error{
+   
     explicit NetworkException(const std::string& message):std::runtime_error("Server Error: "+message){}
+
 };
 
 #endif
