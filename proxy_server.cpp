@@ -3,9 +3,8 @@
 
 /*
   
-   error handling ....
-   destructor for client class
- 
+  error handling ....
+  
 */
 
  void SERVER::server(void){
@@ -65,9 +64,6 @@
            break;
             
          }
-
-
-         
 
     
  }
