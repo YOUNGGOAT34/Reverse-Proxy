@@ -139,8 +139,8 @@ std::string UTILS::read_body(i32 fd,std::string& headers){
  }
 
 
- std::string UTILS::build_http_response(i32 code,std::string& reason,std::string& body){
-       std::string body=
+ std::string UTILS::build_http_response(i32 code,const std::string& reason,const std::string& body){
+       std::string body_=
        std::to_string(code)+" "+reason+" "+body;
 
        std::string headers=
@@ -150,6 +150,6 @@ std::string UTILS::read_body(i32 fd,std::string& headers){
         "Connection: close\r\n"
         "\r\n";
 
-        return headers+body;
+        return headers+body_;
 
  }

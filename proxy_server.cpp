@@ -54,13 +54,32 @@
               /*Now the reverse proxy's client will send the request to the intended server
                and get back the response ,then (reverse proxy server ) will send the response to the client
                */
-                 
+               
+               try{
+
                proxy_client.client(request_buffer,received_bytes);
                std::string response_buffer=proxy_client.get_response();
                ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,proxy_client.get_bytes_received());
                if(sent_bytes_to_client<0){
-                   ServerException("Error sending response to client "+std::string(strerror(errno)));
-              }
+                  throw ClientException("Error sending response to client "+std::string(strerror(errno)));
+                  }
+
+               }catch(const ClientTimeoutException& e){
+                    std::cout<<RED<<e.what()<<RESET<<"\n";
+                    std::string response=utils.build_http_response(504,"Bad Gateway",e.what());
+                    utils.send_(client_fd,response,response.size());
+
+               }catch(const ClientException& e){
+                    std::cout<<RED<<e.what()<<RESET<<"\n";
+                    std::string response=utils.build_http_response(504,"Gateway Timeout",e.what());
+                    utils.send_(client_fd,response,response.size());
+
+               }catch(...){
+                    std::cout<<RED<<"unhandled client exception\n"<<RESET;
+
+               }
+
+
               
                
             }

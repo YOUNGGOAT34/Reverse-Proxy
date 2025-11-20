@@ -14,7 +14,7 @@ class UTILS{
          ssize_t recv_(i32 fd,std::string& buffer);
          std::string read_headers(i32 fd);
          std::string read_body(i32 fd,std::string& headers);
-         std::string build_http_response(i32 code,std::string& reason,std::string& body);
+         std::string build_http_response(i32 code,const std::string& reason,const std::string& body);
 };
 
 struct FDGUARD{
