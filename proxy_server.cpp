@@ -9,13 +9,12 @@
 
  void SERVER::server(void){
 
-
+         
          try{
 
             i32 proxy_server_fd= utils.create_socket();
             if(proxy_server_fd==-1){
-               std::cout<<"error "<<strerror(errno)<<"\n";
-               exit(EXIT_FAILURE);
+                 throw SystemFailureException("Error failed to create server fd"+std::string(strerror(errno)));
             }
 
              i32 opt=1;
@@ -24,16 +23,13 @@
             
             FDGUARD server_guard(proxy_server_fd);
    
-            /*
-               The function will bind,listen and accept connections
-            */
+       
 
          prepare_server_socket(proxy_server_fd);
          struct sockaddr_storage client_address;
          socklen_t socket_len=sizeof(client_address);
-            /*
-              At this point the proxy now should act as a client ,to send this request to the actual server
-           */
+           
+
    
       
           while(true){
@@ -43,29 +39,29 @@
                i32 client_fd=accept(proxy_server_fd,(struct sockaddr*)&client_address,&socket_len);
                FDGUARD client_guard(client_fd);
                if(client_fd==-1){
-                     std::cout<<"error "<<strerror(errno)<<"\n";
-                     exit(EXIT_FAILURE);
+                    throw ServerException("Failed to accept client connection: "+std::string(strerror(errno)));
                }
               
               ssize_t received_bytes=utils.recv_(client_fd,request_buffer);
               if(received_bytes==-1){
-                 std::cout<<"error"<<strerror(errno)<<"\n";
-                 exit(EXIT_FAILURE);
+                   throw ServerException("Error receiving request from client: "+std::string(strerror(errno)));
               }
    
               if(received_bytes==0){
-                  // continue;
+                  continue;
               }
+
+              /*Now the reverse proxy's client will send the request to the intended server
+               and get back the response ,then (reverse proxy server ) will send the response to the client
+               */
                  
                proxy_client.client(request_buffer,received_bytes);
                std::string response_buffer=proxy_client.get_response();
                ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,proxy_client.get_bytes_received());
                if(sent_bytes_to_client<0){
-                 std::cout<<"error "<<strerror(errno)<<"\n";
-                 exit(EXIT_FAILURE);
+                   ServerException("Error sending response to client "+std::string(strerror(errno)));
               }
               
-              break;
                
             }
          }catch(const ServerException& e){
@@ -92,16 +88,15 @@
 
 
          if(bind(proxy_server_fd,(const sockaddr*)&proxy_server_address,sizeof(proxy_server_address))==-1){
-                throw ProxyException("Proxy Server exception: " + std::string(strerror(errno)));
+                throw SystemFailureException("Proxy Server exception: " + std::string(strerror(errno)));
           }
 
         i32 backlog=100;
 
 
        if(listen(proxy_server_fd,backlog)==-1){
-             throw ProxyException("Proxy Server exception: " + std::string(strerror(errno)));
+             throw SystemFailureException("Proxy Server exception: " + std::string(strerror(errno)));
        }
-
-
+       
  }
 
