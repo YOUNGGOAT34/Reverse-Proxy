@@ -15,7 +15,6 @@ CLIENT::~CLIENT(){
 void CLIENT::client(std::string& request_buffer,ssize_t& bytes){
      
          prepare_socket();
-         
         ssize_t sent_bytes_to_server=utils.send_(proxy_client_fd,request_buffer,bytes);
         
         if(sent_bytes_to_server<0){
@@ -36,8 +35,7 @@ void CLIENT::prepare_socket(){
        utils.create_address(proxy_client_address,AddressType::Client);
       i32 connection_status=connect(proxy_client_fd,(struct sockaddr *)&proxy_client_address,sizeof(proxy_client_address));
       if(connection_status==-1){
-           std::cout<<"error "<<strerror(errno)<<"\n";
-           exit(EXIT_FAILURE);
+          throw ServerException("Client exception error: "+std::string(strerror(errno)));
       }
 }
 
