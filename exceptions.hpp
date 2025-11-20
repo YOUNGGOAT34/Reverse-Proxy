@@ -24,6 +24,11 @@ class ClientException: public std::runtime_error{
                explicit ClientException(const std::string& message):std::runtime_error("Client: "+message){}
 };
 
+class ClientTimeoutException:public ClientException{
+      public:
+         using ClientException::ClientException;
+};
+
 
 class SystemFailureException: public std::runtime_error{
          public:
