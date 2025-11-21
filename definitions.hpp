@@ -11,6 +11,8 @@
 #include<string.h>
 #include<unistd.h>
 #include <memory>
+#include <fcntl.h>
+#include "exceptions.hpp"
 
 
 

@@ -79,8 +79,6 @@
 
                }
 
-
-              
                
             }
          }catch(const ServerException& e){

@@ -13,6 +13,17 @@ i32 UTILS::create_socket(void){
  }
 
 
+   i32 UTILS::make_socket_non_blocking(i32 fd){
+          i32 flags=fcntl(fd,F_GETFL,0);
+
+          if(flags==-1){
+              throw ServerException("Error getting the socket flags "+std::string(strerror(errno)));
+          }
+
+          return fcntl(fd,F_SETFL,flags | O_NONBLOCK);   
+   }
+
+
  ssize_t UTILS::recv_(i32 fd,std::string& buffer){
 
       std::string headers=read_headers(fd);
@@ -137,6 +148,8 @@ std::string UTILS::read_body(i32 fd,std::string& headers){
        return sent_bytes;
        
  }
+
+
 
 
  std::string UTILS::build_http_response(i32 code,const std::string& reason,const std::string& body){
