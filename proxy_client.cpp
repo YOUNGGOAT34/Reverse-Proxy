@@ -3,9 +3,11 @@
 CLIENT::CLIENT():proxy_client_fd(0){
      proxy_client_fd=utils.create_socket();
       if(proxy_client_fd==-1){
-           std::cout<<"error "<<strerror(errno)<<"\n";
-           exit(EXIT_FAILURE);
+           throw ClientException("Failed to create proxy client file descriptor "+std::string(strerror(errno)));
        }
+      
+    utils.make_client_socket_non_blocking(proxy_client_fd);
+       
 }
 
 CLIENT::~CLIENT(){

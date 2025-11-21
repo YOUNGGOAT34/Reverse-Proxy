@@ -13,6 +13,7 @@
          try{
 
             i32 proxy_server_fd= utils.create_socket();
+            utils.make_socket_non_blocking(proxy_server_fd);
             if(proxy_server_fd==-1){
                  throw SystemFailureException("Error failed to create server fd"+std::string(strerror(errno)));
             }
@@ -37,6 +38,7 @@
                std::string request_buffer;
    
                i32 client_fd=accept(proxy_server_fd,(struct sockaddr*)&client_address,&socket_len);
+               utils.make_socket_non_blocking(client_fd);
                FDGUARD client_guard(client_fd);
                if(client_fd==-1){
                     throw ServerException("Failed to accept client connection: "+std::string(strerror(errno)));

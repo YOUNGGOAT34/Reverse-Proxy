@@ -13,14 +13,33 @@ i32 UTILS::create_socket(void){
  }
 
 
-   i32 UTILS::make_socket_non_blocking(i32 fd){
+void UTILS::make_socket_non_blocking(i32 fd){
           i32 flags=fcntl(fd,F_GETFL,0);
 
           if(flags==-1){
               throw ServerException("Error getting the socket flags "+std::string(strerror(errno)));
           }
 
-          return fcntl(fd,F_SETFL,flags | O_NONBLOCK);   
+          i32 status= fcntl(fd,F_SETFL,flags | O_NONBLOCK);   
+          if(status==-1){
+               throw ServerException("Error setting the socket flags "+std::string(strerror(errno)));
+          }
+
+   }
+
+
+void UTILS::make_client_socket_non_blocking(i32 fd){
+          i32 flags=fcntl(fd,F_GETFL,0);
+
+          if(flags==-1){
+              throw ServerException("Error getting the client socket flags "+std::string(strerror(errno)));
+          }
+
+          i32 status= fcntl(fd,F_SETFL,flags | O_NONBLOCK);   
+          if(status==-1){
+               throw ServerException("Error setting client the socket flags "+std::string(strerror(errno)));
+          }
+
    }
 
 

@@ -10,7 +10,8 @@ class UTILS{
    
    public:
          i32 create_socket(void);
-         i32 make_socket_non_blocking(i32 fd);
+         void make_socket_non_blocking(i32 fd);
+         void make_client_socket_non_blocking(i32 fd);
          void create_address(struct sockaddr_in& address,AddressType addr_type);
          ssize_t send_(i32 fd,std::string& buffer,const ssize_t& bytes);
          ssize_t recv_(i32 fd,std::string& buffer);
