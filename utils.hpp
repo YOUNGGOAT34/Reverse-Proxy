@@ -13,6 +13,7 @@ class UTILS{
          void make_socket_non_blocking(i32 fd);
          void make_client_socket_non_blocking(i32 fd);
          void create_address(struct sockaddr_in& address,AddressType addr_type);
+         i32 create_epoll_event(i32 fd,i32 epfd);
          ssize_t send_(i32 fd,std::string& buffer,const ssize_t& bytes);
          ssize_t recv_(i32 fd,std::string& buffer);
          std::string read_headers(i32 fd);

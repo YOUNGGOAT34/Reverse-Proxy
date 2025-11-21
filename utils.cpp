@@ -170,6 +170,25 @@ std::string UTILS::read_body(i32 fd,std::string& headers){
 
 
 
+ i32 UTILS::create_epoll_event(i32 fd,i32 epfd){
+            epoll_event ev{};
+            ev.data.fd =fd;
+            ev.events = EPOLLIN; 
+            std::unique_lock<std::mutex> lock(mtx);
+            if (epoll_ctl(epfd, EPOLL_CTL_ADD,fd, &ev) == -1) {
+               if (errno == EEXIST){
+
+                  epoll_ctl(epfd, EPOLL_CTL_MOD,fd, &ev);
+               }else{
+                  throw ProxyException("Failed to create epoll event ,"+std::string(strerror(errno)));
+               }
+            }
+
+   return 0;
+}
+
+
+
 
  std::string UTILS::build_http_response(i32 code,const std::string& reason,const std::string& body){
        std::string body_=
