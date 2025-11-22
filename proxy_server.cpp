@@ -7,6 +7,14 @@
   
 */
 
+SERVER::SERVER(){
+      epfd=epoll_create1(0);
+
+      if(epfd==-1){
+          throw SystemFailureException("Failed to create epoll file descriptor, "+std::string(strerror(errno)));
+      }
+}
+
  void SERVER::server(void){
 
          
@@ -18,39 +26,88 @@
                  throw SystemFailureException("Error failed to create server fd"+std::string(strerror(errno)));
             }
 
+            create_epoll_event(proxy_server_fd,epfd);
+            
              i32 opt=1;
 
             setsockopt(proxy_server_fd,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));
             
             FDGUARD server_guard(proxy_server_fd);
    
-       
-
          prepare_server_socket(proxy_server_fd);
-         struct sockaddr_storage client_address;
-         socklen_t socket_len=sizeof(client_address);
-           
 
-   
-      
+           
+          std::vector<epoll_event> events(1024);
+          
           while(true){
                 
-               std::string request_buffer;
-   
-               i32 client_fd=accept(proxy_server_fd,(struct sockaddr*)&client_address,&socket_len);
-               utils.make_socket_non_blocking(client_fd);
-               FDGUARD client_guard(client_fd);
-               if(client_fd==-1){
-                    throw ServerException("Failed to accept client connection: "+std::string(strerror(errno)));
+             
+
+               i32 result=epoll_wait(epfd,events.data(),events.size(),-1);
+
+               if(result==-1){
+                    throw SystemFailureException("Epoll wait failed "+std::string(strerror(errno)));
                }
+
+
+               for(i32 i=0;i<result;++i){
+                      if(events[i].data.fd==proxy_server_fd){
+                        
+                           accept_new_connection(proxy_server_fd);
+                      }else{
+                         
+                         handle_client(events[i].data.fd);
+                           
+                      }
+               }
+               
+            }
+         }catch(const ServerException& e){
+                std::cerr<<RED<<e.what()<<RESET<<"\n";
+         }catch(const NetworkException& e){
+                std::cerr<<RED<<e.what()<<RESET<<"\n";
+         }catch(const ProxyException& e){
+               std::cerr<<RED<<e.what()<<RESET<<"\n";
+         }catch(const SystemFailureException& e){
+              std::cerr<<RED<<e.what()<<RESET<<"\n";
+              exit(EXIT_FAILURE);
+         }catch(...){
+              std::cerr<<RED<<"Unhandled exception"<<RESET<<"\n";
+         }
+
+ }
+
+
+ void SERVER::accept_new_connection(i32 fd){
+
+         struct sockaddr_storage client_address;
+         socklen_t socket_len=sizeof(client_address);
+
+          i32 client_fd=accept(fd,(struct sockaddr*)&client_address,&socket_len);
+          utils.make_socket_non_blocking(client_fd);
+          // FDGUARD client_guard(client_fd);
+        
+
+          if(client_fd==-1){
+               throw ServerException("Failed to accept client connection: "+std::string(strerror(errno)));
+          }
+
+          create_epoll_event(client_fd,epfd);
+
+ }
+
+
+ void SERVER::handle_client(i32 client_fd){
               
+              std::string request_buffer;
+
               ssize_t received_bytes=utils.recv_(client_fd,request_buffer);
               if(received_bytes==-1){
                    throw ServerException("Error receiving request from client: "+std::string(strerror(errno)));
               }
    
               if(received_bytes==0){
-                  continue;
+                  return;
               }
 
               /*Now the reverse proxy's client will send the request to the intended server
@@ -81,21 +138,6 @@
 
                }
 
-               
-            }
-         }catch(const ServerException& e){
-                std::cerr<<RED<<e.what()<<RESET<<"\n";
-         }catch(const NetworkException& e){
-                std::cerr<<RED<<e.what()<<RESET<<"\n";
-         }catch(const ProxyException& e){
-               std::cerr<<RED<<e.what()<<RESET<<"\n";
-         }catch(const SystemFailureException& e){
-              std::cerr<<RED<<e.what()<<RESET<<"\n";
-              exit(EXIT_FAILURE);
-         }catch(...){
-              std::cerr<<RED<<"Unhandled exception"<<RESET<<"\n";
-         }
-
  }
 
 
@@ -118,4 +160,22 @@
        }
        
  }
+
+
+  i32 SERVER::create_epoll_event(i32 fd,i32 epfd){
+            epoll_event ev{};
+            ev.data.fd =fd;
+            ev.events = EPOLLIN; 
+           
+            if (epoll_ctl(epfd, EPOLL_CTL_ADD,fd, &ev) == -1) {
+               if (errno == EEXIST){
+
+                  epoll_ctl(epfd, EPOLL_CTL_MOD,fd, &ev);
+               }else{
+                  throw ProxyException("Failed to create epoll event ,"+std::string(strerror(errno)));
+               }
+            }
+
+   return 0;
+}
 

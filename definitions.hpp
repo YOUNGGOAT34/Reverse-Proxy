@@ -14,13 +14,11 @@
 #include <fcntl.h>
 #include <mutex>
 #include <sys/epoll.h>
+#include <vector>
 #include "exceptions.hpp"
 
 
-
-
-
-std::mutex mtx;
+// std::mutex mtx;
 
 const auto SERVER_PORT=4220;
 const auto CLIENT_PORT=4221;
