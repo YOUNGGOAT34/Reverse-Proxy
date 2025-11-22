@@ -9,16 +9,15 @@ class CLIENT{
     private:
       //private members
       UTILS utils;
-      i32 proxy_client_fd;
       ssize_t bytes_recved;
       std::string response;
       
       //private functions
 
-      void prepare_socket();
+      i32 prepare_socket(void);
     public:
-         CLIENT();
-         ~CLIENT();
+         CLIENT(){}
+         ~CLIENT(){}
          void client(std::string& request_buffer,ssize_t& bytes);
          ssize_t get_bytes_received();
          std::string& get_response();

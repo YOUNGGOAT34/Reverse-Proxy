@@ -170,19 +170,13 @@ std::string UTILS::read_body(i32 fd,std::string& headers){
 
 
 
-
-
-
-
-
  std::string UTILS::build_http_response(i32 code,const std::string& reason,const std::string& body){
        std::string body_=
        std::to_string(code)+" "+reason+" "+body;
-
        std::string headers=
          "HTTP/1.1 " + std::to_string(code) + " " + reason + "\r\n"
         "Content-Type: text/plain\r\n"
-        "Content-Length: " + std::to_string(body.size()) + "\r\n"
+        "Content-Length: " + std::to_string(body_.size()) + "\r\n"
         "Connection: close\r\n"
         "\r\n";
 

@@ -32,7 +32,7 @@ SERVER::SERVER(){
 
             setsockopt(proxy_server_fd,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));
             
-            FDGUARD server_guard(proxy_server_fd);
+          //   FDGUARD server_guard(proxy_server_fd);
    
          prepare_server_socket(proxy_server_fd);
 
@@ -107,6 +107,8 @@ SERVER::SERVER(){
               }
    
               if(received_bytes==0){
+                  epoll_ctl(epfd,EPOLL_CTL_DEL,client_fd,nullptr);
+                  close(client_fd);
                   return;
               }
 
@@ -123,15 +125,21 @@ SERVER::SERVER(){
                   throw ClientException("Error sending response to client "+std::string(strerror(errno)));
                   }
 
-               }catch(const ClientTimeoutException& e){
-                    std::cout<<RED<<e.what()<<RESET<<"\n";
-                    std::string response=utils.build_http_response(504,"Bad Gateway",e.what());
-                    utils.send_(client_fd,response,response.size());
-
-               }catch(const ClientException& e){
+               }catch(const ClientTimeoutException& e){ 
+                   
                     std::cout<<RED<<e.what()<<RESET<<"\n";
                     std::string response=utils.build_http_response(504,"Gateway Timeout",e.what());
                     utils.send_(client_fd,response,response.size());
+                    epoll_ctl(epfd,EPOLL_CTL_DEL,client_fd,nullptr);
+                    close(client_fd);
+
+               }catch(const ClientException& e){
+                    
+                    std::cout<<RED<<e.what()<<RESET<<"\n";
+                    std::string response=utils.build_http_response(504,"Bad Gateway",e.what());
+                    utils.send_(client_fd,response,response.size());
+                    epoll_ctl(epfd,EPOLL_CTL_DEL,client_fd,nullptr);
+                    close(client_fd);
 
                }catch(...){
                     std::cout<<RED<<"unhandled client exception\n"<<RESET;
