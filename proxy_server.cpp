@@ -1,6 +1,5 @@
 #include "proxy_server.hpp"
 
-
 /*
   
   error handling ....
@@ -93,7 +92,6 @@ SERVER::SERVER(){
           }
 
           create_epoll_event(client_fd,epfd);
-
  }
 
 
