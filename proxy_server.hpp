@@ -14,7 +14,7 @@ class SERVER{
     private:
           //private members
           UTILS utils;
-          CLIENT proxy_client;
+          
           i32 epfd;
           THREADPOOL thread_pool;
           

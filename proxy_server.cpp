@@ -101,9 +101,9 @@
 
 
  void SERVER::handle_client(i32 client_fd){
-              std::cout<<"Here"<<std::endl;
+             
               std::string request_buffer;
-
+ 
               ssize_t received_bytes=utils.recv_(client_fd,request_buffer);
               if(received_bytes==-1){
                    throw ServerException("Error receiving request from client: "+std::string(strerror(errno)));
@@ -121,10 +121,13 @@
                
                try{
 
+               CLIENT proxy_client;
+
                std::string response_buffer;
                ssize_t bytes_recved;
 
                proxy_client.client(request_buffer,received_bytes,response_buffer,bytes_recved);
+               
                // std::string response_buffer=proxy_client.get_response();
                ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,bytes_recved);
                if(sent_bytes_to_client<0){

@@ -14,8 +14,12 @@ class CLIENT{
 
       i32 prepare_socket(void);
     public:
-         CLIENT(){}
-         ~CLIENT(){}
+         CLIENT(){
+            
+         }
+         ~CLIENT(){
+           std::cout<<"Here"<<std::endl;
+         }
          void client(std::string& request_buffer,ssize_t& bytes,std::string& response,ssize_t& bytes_recvd);
          
          
