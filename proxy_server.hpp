@@ -3,6 +3,7 @@
 
 
 #include "proxy_client.hpp"
+#include "threadpool.hpp"
 
 
 
@@ -15,6 +16,8 @@ class SERVER{
           UTILS utils;
           CLIENT proxy_client;
           i32 epfd;
+          THREADPOOL thread_pool;
+          
            
           //private member functions
           void prepare_server_socket(i32 proxy_server_fd);
@@ -24,7 +27,13 @@ class SERVER{
           
 
     public:
-         SERVER();
+         SERVER():thread_pool(32){
+            epfd=epoll_create1(0);
+
+                    if(epfd==-1){
+                        throw SystemFailureException("Failed to create epoll file descriptor, "+std::string(strerror(errno)));
+                    }
+                }
          void server(void);
 };
 

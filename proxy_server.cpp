@@ -6,13 +6,7 @@
   
 */
 
-SERVER::SERVER(){
-      epfd=epoll_create1(0);
 
-      if(epfd==-1){
-          throw SystemFailureException("Failed to create epoll file descriptor, "+std::string(strerror(errno)));
-      }
-}
 
  void SERVER::server(void){
 
@@ -54,8 +48,13 @@ SERVER::SERVER(){
                         
                            accept_new_connection(proxy_server_fd);
                       }else{
+
+                         thread_pool.enqueue(
+                              [this,fd=events[i].data.fd](){
+                                   handle_client(fd);
+                              });
                          
-                         handle_client(events[i].data.fd);
+                     
                            
                       }
                }

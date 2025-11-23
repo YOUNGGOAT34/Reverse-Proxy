@@ -21,7 +21,7 @@ class THREADPOOL{
 
          template<typename F,typename ...Args>
          void enqueue(F&& f,Args&& ...args){
-                 auto func=[f=std::forwad<F>(f),...args=std::forwad<Args>(args)](){
+                 auto func=[f=std::forward<F>(f),...args=std::forward<Args>(args)](){
                            f(args...);
                  };
 
