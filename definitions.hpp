@@ -14,8 +14,12 @@
 #include <fcntl.h>
 #include <mutex>
 #include <sys/epoll.h>
+#include <condition_variable>
+#include <thread>
 #include <vector>
 #include "exceptions.hpp"
+#include <queue>
+#include <functional>
 
 
 // std::mutex mtx;
