@@ -20,6 +20,7 @@
 #include "exceptions.hpp"
 #include <queue>
 #include <functional>
+#include <poll.h>
 
 
 // std::mutex mtx;

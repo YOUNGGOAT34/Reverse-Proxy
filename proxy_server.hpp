@@ -38,6 +38,12 @@ class SERVER{
 };
 
 
+struct CONNECTION{
+
+};
+
+
+
 
 
 #endif

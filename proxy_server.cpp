@@ -49,8 +49,12 @@
                            accept_new_connection(proxy_server_fd);
                       }else{
 
+                         i32 fd=events[i].data.fd;
+
+                         epoll_ctl(epfd,EPOLL_CTL_DEL,fd,nullptr);
+
                          thread_pool.enqueue(
-                              [this,fd=events[i].data.fd](){
+                              [this,fd](){
                                    handle_client(fd);
                               });
                          
@@ -82,13 +86,15 @@
          socklen_t socket_len=sizeof(client_address);
 
           i32 client_fd=accept(fd,(struct sockaddr*)&client_address,&socket_len);
-          utils.make_socket_non_blocking(client_fd);
+          
           // FDGUARD client_guard(client_fd);
         
 
           if(client_fd==-1){
                throw ServerException("Failed to accept client connection: "+std::string(strerror(errno)));
           }
+
+          utils.make_socket_non_blocking(client_fd);
 
           create_epoll_event(client_fd,epfd);
  }
