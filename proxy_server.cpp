@@ -51,7 +51,7 @@
 
                          i32 fd=events[i].data.fd;
 
-                         epoll_ctl(epfd,EPOLL_CTL_DEL,fd,nullptr);
+                         // epoll_ctl(epfd,EPOLL_CTL_DEL,fd,nullptr);
 
                          thread_pool.enqueue(
                               [this,fd](){
@@ -101,7 +101,7 @@
 
 
  void SERVER::handle_client(i32 client_fd){
-              
+              std::cout<<"Here"<<std::endl;
               std::string request_buffer;
 
               ssize_t received_bytes=utils.recv_(client_fd,request_buffer);
@@ -121,9 +121,12 @@
                
                try{
 
-               proxy_client.client(request_buffer,received_bytes);
-               std::string response_buffer=proxy_client.get_response();
-               ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,proxy_client.get_bytes_received());
+               std::string response_buffer;
+               ssize_t bytes_recved;
+
+               proxy_client.client(request_buffer,received_bytes,response_buffer,bytes_recved);
+               // std::string response_buffer=proxy_client.get_response();
+               ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,bytes_recved);
                if(sent_bytes_to_client<0){
                   throw ClientException("Error sending response to client "+std::string(strerror(errno)));
                   }
@@ -133,7 +136,6 @@
                     std::cout<<RED<<e.what()<<RESET<<"\n";
                     std::string response=utils.build_http_response(504,"Gateway Timeout",e.what());
                     utils.send_(client_fd,response,response.size());
-                    epoll_ctl(epfd,EPOLL_CTL_DEL,client_fd,nullptr);
                     close(client_fd);
 
                }catch(const ClientException& e){
@@ -141,7 +143,6 @@
                     std::cout<<RED<<e.what()<<RESET<<"\n";
                     std::string response=utils.build_http_response(504,"Bad Gateway",e.what());
                     utils.send_(client_fd,response,response.size());
-                    epoll_ctl(epfd,EPOLL_CTL_DEL,client_fd,nullptr);
                     close(client_fd);
 
                }catch(...){
@@ -176,7 +177,7 @@
   i32 SERVER::create_epoll_event(i32 fd,i32 epfd){
             epoll_event ev{};
             ev.data.fd =fd;
-            ev.events = EPOLLIN; 
+            ev.events = EPOLLIN | EPOLLONESHOT; 
            
             if (epoll_ctl(epfd, EPOLL_CTL_ADD,fd, &ev) == -1) {
                if (errno == EEXIST){

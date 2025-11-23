@@ -9,8 +9,6 @@ class CLIENT{
     private:
       //private members
       UTILS utils;
-      ssize_t bytes_recved;
-      std::string response;
       
       //private functions
 
@@ -18,9 +16,8 @@ class CLIENT{
     public:
          CLIENT(){}
          ~CLIENT(){}
-         void client(std::string& request_buffer,ssize_t& bytes);
-         ssize_t get_bytes_received();
-         std::string& get_response();
+         void client(std::string& request_buffer,ssize_t& bytes,std::string& response,ssize_t& bytes_recvd);
+         
          
 
 };

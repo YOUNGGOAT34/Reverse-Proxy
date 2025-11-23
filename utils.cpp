@@ -45,8 +45,10 @@ void UTILS::make_client_socket_non_blocking(i32 fd){
 
  ssize_t UTILS::recv_(i32 fd,std::string& buffer){
 
-      std::string headers=read_headers(fd);
-      std::string body=read_body(fd,headers);
+     ssize_t bytes_received=0;
+
+      std::string headers=read_headers(fd,bytes_received);
+      std::string body=read_body(fd,headers,bytes_received);
       std::string res=headers+body;
       buffer=std::move(res);
     
@@ -56,7 +58,7 @@ void UTILS::make_client_socket_non_blocking(i32 fd){
 
 
 
-std::string  UTILS::read_headers(i32 fd){
+std::string  UTILS::read_headers(i32 fd,ssize_t bytes_received){
      i8 buffer[BUFFER]={0};
      std::string request_data;
      while(true){
@@ -89,7 +91,7 @@ std::string  UTILS::read_headers(i32 fd){
 }
 
 
-std::string UTILS::read_body(i32 fd,std::string& headers){
+std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t bytes_received){
     i8 buffer[BUFFER]={0};
     std::string body;
     //find content length
@@ -127,15 +129,15 @@ std::string UTILS::read_body(i32 fd,std::string& headers){
 
 
     while(body.size()<content_len){
-           ssize_t bytes_received=recv(fd,buffer,BUFFER,0);
+           ssize_t bytes_received_=recv(fd,buffer,BUFFER,0);
 
            if(bytes_received>0){
-                this->bytes_received+=bytes_received;
-                body.append(buffer,bytes_received);
+                bytes_received+=bytes_received_;
+                body.append(buffer,bytes_received_);
                 continue;
-           }else if(bytes_received==0){
+           }else if(bytes_received_==0){
              break;
-         }else if(bytes_received<0){
+         }else if(bytes_received_<0){
 
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
                      
@@ -153,11 +155,11 @@ std::string UTILS::read_body(i32 fd,std::string& headers){
 }
 
 
- ssize_t UTILS::send_(i32 fd,std::string& buffer,const ssize_t& bytes){
+ ssize_t UTILS::send_(i32 fd,std::string& buffer,const ssize_t bytes){
        ssize_t sent_bytes=0;
       
        while(sent_bytes<bytes){
-             ssize_t sent=send(fd,buffer.c_str()+sent_bytes,bytes-sent_bytes,0);
+             ssize_t sent=send(fd,buffer.data()+sent_bytes,bytes-sent_bytes,0);
              if(sent<=0){
                 return -1;
              }
@@ -171,15 +173,14 @@ std::string UTILS::read_body(i32 fd,std::string& headers){
 
 
  std::string UTILS::build_http_response(i32 code,const std::string& reason,const std::string& body){
-       std::string body_=
-       std::to_string(code)+" "+reason+" "+body;
+    
        std::string headers=
          "HTTP/1.1 " + std::to_string(code) + " " + reason + "\r\n"
         "Content-Type: text/plain\r\n"
-        "Content-Length: " + std::to_string(body_.size()) + "\r\n"
+        "Content-Length: " + std::to_string(body.size()) + "\r\n"
         "Connection: close\r\n"
         "\r\n";
 
-        return headers+body_;
+        return headers+body;
 
  }

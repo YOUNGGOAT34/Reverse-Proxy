@@ -1,6 +1,6 @@
 #include "proxy_client.hpp"
 
-void CLIENT::client(std::string& request_buffer,ssize_t& bytes){
+void CLIENT::client(std::string& request_buffer,ssize_t& bytes,std::string& res,ssize_t& bytes_recvd){
 
          
      
@@ -12,9 +12,10 @@ void CLIENT::client(std::string& request_buffer,ssize_t& bytes){
            throw ClientException("Failed to send clien's request to the server "+std::string(strerror(errno)));
         }
   
-        response.clear();
+        
 
-        bytes_recved=utils.recv_(proxy_client_fd,response);
+        ssize_t bytes_recved=utils.recv_(proxy_client_fd,res);
+
         if(bytes_recved<0){
             close(proxy_client_fd);
            if(errno==ETIMEDOUT){
@@ -22,6 +23,11 @@ void CLIENT::client(std::string& request_buffer,ssize_t& bytes){
            }
            throw ClientException("Failed to receive server's response to the client "+std::string(strerror(errno)));
         }
+
+        bytes_recvd=bytes_recved;
+
+
+        close(proxy_client_fd);
 }
 
 
