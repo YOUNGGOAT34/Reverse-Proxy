@@ -16,8 +16,8 @@ class UTILS{
          
          ssize_t send_(i32 fd,std::string& buffer,const ssize_t bytes);
          ssize_t recv_(i32 fd,std::string& buffer);
-         std::string read_headers(i32 fd,ssize_t bytes_received);
-         std::string read_body(i32 fd,std::string& headers,ssize_t bytes_received);
+         std::string read_headers(i32 fd,ssize_t& bytes_received);
+         std::string read_body(i32 fd,std::string& headers,ssize_t& bytes_received);
          std::string build_http_response(i32 code,const std::string& reason,const std::string& body);
 };
 

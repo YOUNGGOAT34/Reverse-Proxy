@@ -45,12 +45,15 @@ void UTILS::make_client_socket_non_blocking(i32 fd){
 
  ssize_t UTILS::recv_(i32 fd,std::string& buffer){
 
+     
      ssize_t bytes_received=0;
 
       std::string headers=read_headers(fd,bytes_received);
       std::string body=read_body(fd,headers,bytes_received);
       std::string res=headers+body;
       buffer=std::move(res);
+
+      std::cout<<"Here"<<bytes_received<<std::endl;
     
       return bytes_received;
 
@@ -58,7 +61,7 @@ void UTILS::make_client_socket_non_blocking(i32 fd){
 
 
 
-std::string  UTILS::read_headers(i32 fd,ssize_t bytes_received){
+std::string  UTILS::read_headers(i32 fd,ssize_t& bytes_received){
      i8 buffer[BUFFER]={0};
      std::string request_data;
      while(true){
@@ -91,7 +94,7 @@ std::string  UTILS::read_headers(i32 fd,ssize_t bytes_received){
 }
 
 
-std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t bytes_received){
+std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& bytes_received){
     i8 buffer[BUFFER]={0};
     std::string body;
     //find content length
