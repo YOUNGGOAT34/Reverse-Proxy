@@ -67,8 +67,9 @@ std::string  UTILS::read_headers(i32 fd,ssize_t& bytes_received){
      std::string request_data;
      while(true){
          ssize_t received_bytes=recv(fd,buffer,BUFFER,0);
+        //  std::cout<<"Heere"<<received_bytes<<std::endl;
          if(received_bytes>0){
-              std::cout<<received_bytes<<std::endl;
+              
              bytes_received+=received_bytes;
              request_data.append(buffer,received_bytes);
              if(request_data.find("\r\n\r\n")!=std::string::npos){
@@ -80,9 +81,11 @@ std::string  UTILS::read_headers(i32 fd,ssize_t& bytes_received){
              break;
          }else if(received_bytes<0){
 
+                 
+
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
-                     
-                      break;
+                      
+                    continue;
                    }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
           
                          break;

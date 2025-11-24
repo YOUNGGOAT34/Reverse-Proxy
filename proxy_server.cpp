@@ -53,14 +53,14 @@
 
                          i32 fd=events[i].data.fd;
 
-                         // epoll_ctl(epfd,EPOLL_CTL_DEL,fd,nullptr);
+                         epoll_ctl(epfd,EPOLL_CTL_DEL,fd,nullptr);
 
-                         // thread_pool.enqueue(
-                         //      [this,fd](){
-                         //           handle_client(fd);
-                         //      });
+                         thread_pool.enqueue(
+                              [this,fd](){
+                                   handle_client(fd);
+                              });
 
-                         handle_client(fd);
+                         // handle_client(fd);
                         
                          
                      
