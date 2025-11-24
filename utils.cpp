@@ -175,15 +175,17 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& bytes_received
 
 
 
- std::string UTILS::build_http_response(i32 code,const std::string& reason,const std::string& body){
+ std::string UTILS::build_http_response(i32 code,const std::string& reason){
+
+       std::string body=std::to_string(code)+" "+reason;
     
        std::string headers=
          "HTTP/1.1 " + std::to_string(code) + " " + reason + "\r\n"
         "Content-Type: text/plain\r\n"
-        "Content-Length: " + std::to_string(reason.size()) + "\r\n"
+        "Content-Length: " + std::to_string(body.size()) + "\r\n"
         "Connection: close\r\n"
         "\r\n";
 
-        return headers+reason;
+        return headers+body;
 
  }

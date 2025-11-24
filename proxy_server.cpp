@@ -137,8 +137,6 @@
                std::string response_buffer;
                ssize_t bytes_recved;
 
-               
-
                proxy_client.client(request_buffer,received_bytes,response_buffer,bytes_recved);
                
                ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,bytes_recved);
@@ -149,14 +147,14 @@
                }catch(const ClientTimeoutException& e){ 
                    
                     std::cout<<RED<<e.what()<<RESET<<"\n";
-                    std::string response=utils.build_http_response(504,"Gateway Timeout",e.what());
+                    std::string response=utils.build_http_response(504,"Gateway Timeout");
                     utils.send_(client_fd,response,response.size());
                     close(client_fd);
 
                }catch(const ClientException& e){
                     
                     std::cout<<RED<<e.what()<<RESET<<"\n";
-                    std::string response=utils.build_http_response(504,"Bad Gateway",e.what());
+                    std::string response=utils.build_http_response(504,"Bad Gateway");
                     utils.send_(client_fd,response,response.size());
                     close(client_fd);
 

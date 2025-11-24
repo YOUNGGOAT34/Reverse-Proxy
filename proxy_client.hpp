@@ -17,9 +17,7 @@ class CLIENT{
          CLIENT(){
             
          }
-         ~CLIENT(){
-           std::cout<<"Here"<<std::endl;
-         }
+         ~CLIENT(){}
          void client(std::string& request_buffer,ssize_t& bytes,std::string& response,ssize_t& bytes_recvd);
          
          
