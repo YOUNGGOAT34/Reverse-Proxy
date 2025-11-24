@@ -13,7 +13,6 @@ void CLIENT::client(std::string& request_buffer,ssize_t& bytes,std::string& res,
         }
   
         
-
         ssize_t bytes_recved=utils.recv_(proxy_client_fd,res);
 
         if(bytes_recved<0){

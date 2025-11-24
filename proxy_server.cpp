@@ -19,11 +19,13 @@
                  throw SystemFailureException("Error failed to create server fd"+std::string(strerror(errno)));
             }
 
-            create_epoll_event(proxy_server_fd,epfd);
-            
-             i32 opt=1;
+            i32 opt=1;
 
             setsockopt(proxy_server_fd,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof(opt));
+
+            create_epoll_event(proxy_server_fd,epfd);
+            
+
             
           //   FDGUARD server_guard(proxy_server_fd);
    
@@ -53,10 +55,13 @@
 
                          // epoll_ctl(epfd,EPOLL_CTL_DEL,fd,nullptr);
 
-                         thread_pool.enqueue(
-                              [this,fd](){
-                                   handle_client(fd);
-                              });
+                         // thread_pool.enqueue(
+                         //      [this,fd](){
+                         //           handle_client(fd);
+                         //      });
+
+                         handle_client(fd);
+                        
                          
                      
                            
@@ -101,6 +106,8 @@
 
 
  void SERVER::handle_client(i32 client_fd){
+
+               
              
               std::string request_buffer;
  
@@ -108,8 +115,11 @@
               if(received_bytes==-1){
                    throw ServerException("Error receiving request from client: "+std::string(strerror(errno)));
               }
+
+             
    
               if(received_bytes==0){
+                std::cout<<"Here"<<std::endl;
                   epoll_ctl(epfd,EPOLL_CTL_DEL,client_fd,nullptr);
                   close(client_fd);
                   return;
@@ -118,6 +128,7 @@
               /*Now the reverse proxy's client will send the request to the intended server
                and get back the response ,then (reverse proxy server ) will send the response to the client
                */
+
                
                try{
 
@@ -126,9 +137,10 @@
                std::string response_buffer;
                ssize_t bytes_recved;
 
+               
+
                proxy_client.client(request_buffer,received_bytes,response_buffer,bytes_recved);
                
-               // std::string response_buffer=proxy_client.get_response();
                ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,bytes_recved);
                if(sent_bytes_to_client<0){
                   throw ClientException("Error sending response to client "+std::string(strerror(errno)));

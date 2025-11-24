@@ -21,9 +21,7 @@ class THREADPOOL{
 
          template<typename F,typename ...Args>
          void enqueue(F&& f,Args&& ...args){
-                 auto func=[f=std::forward<F>(f),...args=std::forward<Args>(args)](){
-                           f(args...);
-                 };
+                 auto func=std::bind(std::forward<F>(f),std::forward<Args>(args)...);
 
                  {
                        std::unique_lock<std::mutex> loc(mtx);
