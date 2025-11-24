@@ -112,6 +112,7 @@
               std::string request_buffer;
  
               ssize_t received_bytes=utils.recv_(client_fd,request_buffer);
+            
               if(received_bytes==-1){
                    throw ServerException("Error receiving request from client: "+std::string(strerror(errno)));
               }
@@ -133,6 +134,7 @@
                try{
 
                CLIENT proxy_client;
+                 
 
                std::string response_buffer;
                ssize_t bytes_recved;
