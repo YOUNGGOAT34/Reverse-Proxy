@@ -54,7 +54,7 @@
                          i32 fd=events[i].data.fd;
 
                          epoll_ctl(epfd,EPOLL_CTL_DEL,fd,nullptr);
-                         std::cout<<"We got here"<<std::endl;
+                         // std::cout<<"We got here"<<std::endl;
                          thread_pool.enqueue(
                               [this,fd](){
                                    handle_client(fd);
@@ -107,33 +107,7 @@
 
  void SERVER::handle_client(i32 client_fd){
 
-
-
-             struct pollfd pfd{};
-             pfd.fd=client_fd;
-             pfd.events=POLLOUT;
-
-              i32 poll_status=poll(&pfd,1,5000);
-
-
-
-
-             if(poll_status==0){
-                 close(client_fd);
-                 throw ClientTimeoutException("Timeout connecting to upstream seever(in handle client)");
-             }else if(poll_status<0){
-                 close(client_fd);
-                 throw ClientException("Poll error on connect in handle client "+std::string(strerror(errno)));
-             }else{
-                   i32 so_error=0;
-                   socklen_t len=sizeof(so_error);
-
-                   if(getsockopt(client_fd,SOL_SOCKET,SO_ERROR,&so_error,&len)<0 || so_error!=0){
-                        close(client_fd);
-                        throw ClientException("connection failed after poll in handle client,"+std::string(strerror(errno)));
-                   }
-             }
-               
+     
              
               std::string request_buffer;
  
@@ -218,7 +192,7 @@
   i32 SERVER::create_epoll_event(i32 fd,i32 epfd){
             epoll_event ev{};
             ev.data.fd =fd;
-            ev.events = EPOLLIN | EPOLLONESHOT; 
+            ev.events = EPOLLIN; 
            
             if (epoll_ctl(epfd, EPOLL_CTL_ADD,fd, &ev) == -1) {
                if (errno == EEXIST){
