@@ -21,12 +21,13 @@
 #include <queue>
 #include <functional>
 #include <poll.h>
+#include <arpa/inet.h>
 
 
 // std::mutex mtx;
 
 const auto SERVER_PORT=4220;
-const auto CLIENT_PORT=4221;
+const auto CLIENT_PORT=8080;
 const auto BUFFER=4096;
 
 //bytes

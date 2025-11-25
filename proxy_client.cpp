@@ -8,13 +8,14 @@ void CLIENT::client(std::string& request_buffer,ssize_t& bytes,std::string& res,
         
         if(sent_bytes_to_server<0){
            close(proxy_client_fd);
-           throw ClientException("Failed to send clien's request to the server "+std::string(strerror(errno)));
+           throw ClientException("Failed to send client's request to the server "+std::string(strerror(errno)));
         }
-  
+        
+
         
         ssize_t bytes_recved=utils.recv_(proxy_client_fd,res);
         
-        std::cout<<res.size()<<std::endl;
+        // std::cout<<res.size()<<std::endl;
 
         if(bytes_recved<0){
             close(proxy_client_fd);

@@ -7,9 +7,18 @@ i32 UTILS::create_socket(void){
  void UTILS::create_address(struct sockaddr_in& address,AddressType addr_type){
        memset(&address,0,sizeof(address));
 
-         address.sin_addr.s_addr=htonl(addr_type==AddressType::Server?INADDR_ANY:INADDR_LOOPBACK);
+        //  address.sin_addr.s_addr=htonl(addr_type==AddressType::Server?INADDR_ANY:192.168.100.5);
+         if(addr_type==AddressType::Server){
+              address.sin_port=htons(SERVER_PORT);
+              address.sin_addr.s_addr=htonl(INADDR_ANY);
+         }else{
+               address.sin_port=htons(CLIENT_PORT);
+                if(inet_pton(AF_INET,"192.168.100.5",&address.sin_addr.s_addr)!=1){
+                      throw NetworkException("Invalid upstream IP address "+std::string(strerror(errno)));
+                }
+         }
          address.sin_family=AF_INET;
-         address.sin_port=htons(addr_type==AddressType::Server?SERVER_PORT:CLIENT_PORT);   
+           
  }
 
 
@@ -52,13 +61,7 @@ void UTILS::make_client_socket_non_blocking(i32 fd){
       std::string body=read_body(fd,headers,bytes_received);
       std::string res=headers+body;
       buffer=std::move(res);
-     
-      std::cout<<"body size"<<body.size()<<std::endl;
-      std::cout<<"headers size"<<headers.size()<<std::endl;
-
-      std::cout<<buffer.size()<<"Inisde received"<<std::endl;
-      std::cout<<bytes_received<<"bytes Inisde received"<<std::endl;
-
+    
       return bytes_received;
 
  }
@@ -170,15 +173,21 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
 
  ssize_t UTILS::send_(i32 fd,std::string& buffer,const ssize_t bytes){
        ssize_t sent_bytes=0;
-      
+       
+       errno=0;
        while(sent_bytes<bytes){
              ssize_t sent=send(fd,buffer.data()+sent_bytes,bytes-sent_bytes,0);
+            
+          
+
              if(sent>0){
+                
                 sent_bytes+=sent;
-                return -1;
-             }else if(sent==-1){
+                
+             }
+             else if(sent==-1){
                   if(errno==EAGAIN || errno==EWOULDBLOCK){
-                    //   break;
+                      break;
                   }else if(errno==EINTR){
                        continue;
                   }else{
@@ -187,8 +196,13 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
 
              }
 
-             
+    
+   
        }
+
+      
+       
+
        return sent_bytes;
        
  }
