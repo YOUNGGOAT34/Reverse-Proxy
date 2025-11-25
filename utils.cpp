@@ -65,14 +65,14 @@ void UTILS::make_client_socket_non_blocking(i32 fd){
 
 
 
-std::string  UTILS::read_headers(i32 fd,ssize_t& bytes_received){
+std::string  UTILS::read_headers(i32 fd,ssize_t& total_bytes_received){
      i8 buffer[BUFFER]={0};
      std::string request_data;
      while(true){
          ssize_t received_bytes=recv(fd,buffer,BUFFER,0);
          if(received_bytes>0){
               
-             bytes_received+=received_bytes;
+             total_bytes_received+=received_bytes;
              request_data.append(buffer,received_bytes);
              if(request_data.find("\r\n\r\n")!=std::string::npos){
                  break;
@@ -86,7 +86,7 @@ std::string  UTILS::read_headers(i32 fd,ssize_t& bytes_received){
                  
 
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
-                    // break;
+                    break;
                    }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
           
                          break;
@@ -102,7 +102,7 @@ std::string  UTILS::read_headers(i32 fd,ssize_t& bytes_received){
 }
 
 
-std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& bytes_received){
+std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_received){
     i8 buffer[BUFFER]={0};
     std::string body;
     //find content length
@@ -143,7 +143,7 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& bytes_received
            ssize_t bytes_received_=recv(fd,buffer,BUFFER,0);
 
            if(bytes_received_>0){
-                bytes_received+=bytes_received_;
+                total_bytes_received+=bytes_received_;
                 body.append(buffer,bytes_received_);
                 continue;
            }else if(bytes_received_==0){
@@ -152,7 +152,7 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& bytes_received
 
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
                      
-                    //   break;
+                      break;
                    }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
           
                          break;
