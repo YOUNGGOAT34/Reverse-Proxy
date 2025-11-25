@@ -86,11 +86,13 @@ std::string  UTILS::read_headers(i32 fd,ssize_t& total_bytes_received){
                  
 
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
-                    // break;
+                    break;
                    }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
           
-                         break;
-                }
+                        //  break;
+                  }else if(errno==EINTR){
+                        continue;
+                  }
          }
         
      }
@@ -147,12 +149,12 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
                 body.append(buffer,bytes_received_);
                 continue;
            }else if(bytes_received_==0){
-             break;
+            //  break;
          }else if(bytes_received_<0){
 
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
                      
-                    //   break;
+                      break;
                    }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
           
                          break;
@@ -171,11 +173,21 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
       
        while(sent_bytes<bytes){
              ssize_t sent=send(fd,buffer.data()+sent_bytes,bytes-sent_bytes,0);
-             if(sent<=0){
+             if(sent>0){
+                sent_bytes+=sent;
                 return -1;
+             }else if(sent==-1){
+                  if(errno==EAGAIN || errno==EWOULDBLOCK){
+                    //   break;
+                  }else if(errno==EINTR){
+                       continue;
+                  }else{
+                     return -1;
+                  }
+
              }
 
-             sent_bytes+=sent;
+             
        }
        return sent_bytes;
        

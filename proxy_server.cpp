@@ -53,7 +53,7 @@
 
                          i32 fd=events[i].data.fd;
 
-                         // epoll_ctl(epfd,EPOLL_CTL_DEL,fd,nullptr);
+                         epoll_ctl(epfd,EPOLL_CTL_DEL,fd,nullptr);
                          // std::cout<<"We got here"<<std::endl;
                          thread_pool.enqueue(
                               [this,fd](){

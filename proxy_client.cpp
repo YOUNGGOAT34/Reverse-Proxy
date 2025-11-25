@@ -16,7 +16,7 @@ void CLIENT::client(std::string& request_buffer,ssize_t& bytes,std::string& res,
         ssize_t bytes_recved=utils.recv_(proxy_client_fd,res);
         
         std::cout<<res.size()<<std::endl;
-        
+
         if(bytes_recved<0){
             close(proxy_client_fd);
            if(errno==ETIMEDOUT){
@@ -64,9 +64,14 @@ i32 CLIENT::prepare_socket(void){
                    i32 so_error=0;
                    socklen_t len=sizeof(so_error);
 
-                   if(getsockopt(proxy_client_fd,SOL_SOCKET,SO_ERROR,&so_error,&len)<0 || so_error!=0){
+                   if(getsockopt(proxy_client_fd,SOL_SOCKET,SO_ERROR,&so_error,&len)<0){
                         close(proxy_client_fd);
-                        throw ClientException("connection failed after poll ,"+std::string(strerror(errno)));
+                        throw ClientException("getsockopt failed ,"+std::string(strerror(errno)));
+                   }
+
+                   if(so_error!=0){
+                         close(proxy_client_fd);
+                        throw ClientException("connection failed after poll ,"+std::string(strerror(so_error)));
                    }
              }
         }
