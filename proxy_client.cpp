@@ -46,6 +46,7 @@ i32 CLIENT::prepare_socket(void){
         }
 
         if(connection_status==-1 && errno==EINPROGRESS){
+            
              struct pollfd pfd{};
              pfd.fd=proxy_client_fd;
              pfd.events=POLLOUT;

@@ -84,8 +84,8 @@ std::string  UTILS::read_headers(i32 fd,ssize_t& bytes_received){
                  
 
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
-                      
-                    continue;
+                    // continue;
+                    // break;
                    }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
           
                          break;
