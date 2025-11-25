@@ -52,10 +52,13 @@ void UTILS::make_client_socket_non_blocking(i32 fd){
       std::string body=read_body(fd,headers,bytes_received);
       std::string res=headers+body;
       buffer=std::move(res);
+     
+      std::cout<<"body size"<<body.size()<<std::endl;
+      std::cout<<"headers size"<<headers.size()<<std::endl;
 
+      std::cout<<buffer.size()<<"Inisde received"<<std::endl;
+      std::cout<<bytes_received<<"bytes Inisde received"<<std::endl;
 
-   
-    
       return bytes_received;
 
  }
@@ -67,7 +70,6 @@ std::string  UTILS::read_headers(i32 fd,ssize_t& bytes_received){
      std::string request_data;
      while(true){
          ssize_t received_bytes=recv(fd,buffer,BUFFER,0);
-        //  std::cout<<"Heere"<<received_bytes<<std::endl;
          if(received_bytes>0){
               
              bytes_received+=received_bytes;
@@ -84,7 +86,6 @@ std::string  UTILS::read_headers(i32 fd,ssize_t& bytes_received){
                  
 
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
-                    // continue;
                     // break;
                    }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
           
@@ -141,17 +142,17 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& bytes_received
     while(body.size()<content_len){
            ssize_t bytes_received_=recv(fd,buffer,BUFFER,0);
 
-           if(bytes_received>0){
+           if(bytes_received_>0){
                 bytes_received+=bytes_received_;
                 body.append(buffer,bytes_received_);
                 continue;
            }else if(bytes_received_==0){
-             break;
+            //  break;
          }else if(bytes_received_<0){
 
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
                      
-                      break;
+                    //   break;
                    }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
           
                          break;
