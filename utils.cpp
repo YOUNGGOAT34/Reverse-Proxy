@@ -91,7 +91,9 @@ std::string  UTILS::read_headers(i32 fd,ssize_t& total_bytes_received){
                
 
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
-                      std::cout<<"Here"<<std::endl;
+                    /*
+                       Figure out on how to handle this 
+                    */
                     // break;
                    }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
           
@@ -159,8 +161,10 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
          }else if(bytes_received_<0){
 
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
-                     
-                      break;
+                     /*
+                        Figure out on how to handle this
+                     */
+                    //   break;
                    }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
           
                          break;
@@ -190,7 +194,10 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
              }
              else if(sent==-1){
                   if(errno==EAGAIN || errno==EWOULDBLOCK){
-                      break;
+                    /*
+                      Figure out on how to handle this
+                    */
+                    //   break;
                   }else if(errno==EINTR){
                        continue;
                   }else{
