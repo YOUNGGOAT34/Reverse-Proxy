@@ -19,6 +19,7 @@ class UTILS{
          std::string read_headers(i32 fd,ssize_t& bytes_received);
          std::string read_body(i32 fd,std::string& headers,ssize_t& bytes_received);
          std::string build_http_response(i32 code,const std::string& reason);
+         i32 calculate_remaining_time(auto& start);
 };
 
 struct FDGUARD{

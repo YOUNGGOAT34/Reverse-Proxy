@@ -29,6 +29,7 @@
 const auto SERVER_PORT=4220;
 const auto CLIENT_PORT=8080;
 const auto BUFFER=4096;
+const auto TIMEOUT_MS=5000;
 
 //bytes
 using i8=char;
@@ -41,6 +42,7 @@ using u16=unsigned short int;
 //32-bit integers
 using i32=int;
 using u32=unsigned int;
+
 
 //long integers
 using i64=long int;

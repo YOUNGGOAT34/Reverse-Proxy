@@ -219,6 +219,8 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
 
 
 
+
+
  std::string UTILS::build_http_response(i32 code,const std::string& reason){
 
        std::string body=std::to_string(code)+" "+reason;
@@ -232,4 +234,12 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
 
         return headers+body;
 
+ }
+
+ i32 UTILS::calculate_remaining_time(auto& start){
+        auto now=std::chrono::steady_clock::now();
+        auto elapsed_time=std::chrono::duration<std::chrono::milliseconds>(now-start).count();
+        i32 left=TIMEOUT_MS-static_cast<i32>(elapsed_time);
+
+        return left>0 ?left:0;
  }
