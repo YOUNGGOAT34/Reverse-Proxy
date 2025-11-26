@@ -58,6 +58,7 @@ void UTILS::make_client_socket_non_blocking(i32 fd){
      ssize_t bytes_received=0;
 
       std::string headers=read_headers(fd,bytes_received);
+    
       std::string body=read_body(fd,headers,bytes_received);
       std::string res=headers+body;
       buffer=std::move(res);
@@ -83,16 +84,18 @@ std::string  UTILS::read_headers(i32 fd,ssize_t& total_bytes_received){
 
              continue;
          }else if(received_bytes==0){
+             
              break;
          }else if(received_bytes<0){
 
-                 
+               
 
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
-                    break;
+                      std::cout<<"Here"<<std::endl;
+                    // break;
                    }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
           
-                        //  break;
+                         break;
                   }else if(errno==EINTR){
                         continue;
                   }

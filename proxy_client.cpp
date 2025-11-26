@@ -15,7 +15,8 @@ void CLIENT::client(std::string& request_buffer,ssize_t& bytes,std::string& res,
         
         ssize_t bytes_recved=utils.recv_(proxy_client_fd,res);
         
-        // std::cout<<res.size()<<std::endl;
+        // std::cout<<bytes_recved<<std::endl;
+
 
         if(bytes_recved<0){
             close(proxy_client_fd);
