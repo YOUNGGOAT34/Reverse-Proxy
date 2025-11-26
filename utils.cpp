@@ -148,6 +148,7 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
 
     
 
+    auto start_clock=std::chrono::steady_clock::now();
 
     while(body.size()<content_len){
            ssize_t bytes_received_=recv(fd,buffer,BUFFER,0);
@@ -161,10 +162,26 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
          }else if(bytes_received_<0){
 
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
-                     /*
-                        Figure out on how to handle this
-                     */
-                    //   break;
+
+                      i32 timeout=calculate_remaining_time(start_clock);
+                      if(timeout==0){
+                          throw ClientTimeoutException("Server timed out sending response ");
+                      }
+
+                      struct pollfd pfd;
+                      pfd.fd=fd;
+                      pfd.events=POLLIN;
+                      i32 poll_result=poll(&pfd,1,timeout);
+
+
+                      if(poll_result==0){
+                          throw ClientTimeoutException("Upstream server timed out ");
+                      }else if(poll_result<0){
+                          throw ClientException("Error while polling , "+std::string(strerror(errno)));
+                      }
+                      continue;
+
+             
                    }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
           
                          break;
@@ -236,9 +253,10 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
 
  }
 
+
  i32 UTILS::calculate_remaining_time(auto& start){
         auto now=std::chrono::steady_clock::now();
-        auto elapsed_time=std::chrono::duration<std::chrono::milliseconds>(now-start).count();
+        auto elapsed_time=std::chrono::duration_cast<std::chrono::milliseconds>(now-start).count();
         i32 left=TIMEOUT_MS-static_cast<i32>(elapsed_time);
 
         return left>0 ?left:0;

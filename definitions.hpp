@@ -29,7 +29,7 @@
 const auto SERVER_PORT=4220;
 const auto CLIENT_PORT=8080;
 const auto BUFFER=4096;
-const auto TIMEOUT_MS=5000;
+const int TIMEOUT_MS=5000;
 
 //bytes
 using i8=char;
