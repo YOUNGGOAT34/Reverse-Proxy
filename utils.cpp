@@ -12,12 +12,12 @@ i32 UTILS::create_socket(void){
               address.sin_port=htons(SERVER_PORT);
               address.sin_addr.s_addr=htonl(INADDR_ANY);
          }else{
-               address.sin_port=htons(4221);
-               //  if(inet_pton(AF_INET,"192.168.100.5",&address.sin_addr.s_addr)!=1){
-               //        throw NetworkException("Invalid upstream IP address "+std::string(strerror(errno)));
-               //  }
+               address.sin_port=htons(CLIENT_PORT);
+                if(inet_pton(AF_INET,"192.168.100.30",&address.sin_addr.s_addr)!=1){
+                      throw NetworkException("Invalid upstream IP address "+std::string(strerror(errno)));
+                }
 
-               address.sin_addr.s_addr=htonl(INADDR_LOOPBACK);
+               // address.sin_addr.s_addr=htonl(INADDR_LOOPBACK);
 
 
          }

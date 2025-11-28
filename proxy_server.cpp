@@ -38,7 +38,7 @@
                 
              
 
-               i32 result=epoll_wait(epfd,events.data(),events.size(),1000);
+               i32 result=epoll_wait(epfd,events.data(),events.size(),-1);
 
                if(result==-1){
                     throw SystemFailureException("Epoll wait failed "+std::string(strerror(errno)));
@@ -54,17 +54,11 @@
                          i32 fd=events[i].data.fd;
 
                          epoll_ctl(epfd,EPOLL_CTL_DEL,fd,nullptr);
-                         // std::cout<<"We got here"<<std::endl;
                          thread_pool.enqueue(
                               [this,fd](){
                                    handle_client(fd);
                               });
 
-                         // handle_client(fd);
-                        
-                         
-                     
-                           
                       }
                }
                
