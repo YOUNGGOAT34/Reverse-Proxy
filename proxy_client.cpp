@@ -53,7 +53,7 @@ i32 CLIENT::prepare_socket(void){
              pfd.fd=proxy_client_fd;
              pfd.events=POLLOUT;
 
-             i32 poll_status=poll(&pfd,1,5000);
+             i32 poll_status=poll(&pfd,1,500);
 
              if(poll_status==0){
                  close(proxy_client_fd);

@@ -86,7 +86,6 @@
 
           i32 client_fd=accept(fd,(struct sockaddr*)&client_address,&socket_len);
           
-          // FDGUARD client_guard(client_fd);
         
 
           if(client_fd==-1){
