@@ -76,6 +76,11 @@ void UTILS::make_client_socket_non_blocking(i32 fd){
 std::string  UTILS::read_headers(i32 fd,ssize_t& total_bytes_received){
      i8 buffer[BUFFER]={0};
      std::string request_data;
+
+
+
+         auto start_clock=std::chrono::steady_clock::now();
+
      while(true){
          ssize_t received_bytes=recv(fd,buffer,BUFFER,0);
          if(received_bytes>0){
@@ -95,10 +100,24 @@ std::string  UTILS::read_headers(i32 fd,ssize_t& total_bytes_received){
                
 
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
-                    /*
-                       Figure out on how to handle this 
-                    */
-                    // break;
+                            i32 timeout=calculate_remaining_time(start_clock);
+                            if(timeout==0){
+                                throw ClientTimeoutException("Server timed out sending response ");
+                            }
+
+                            struct pollfd pfd;
+                            pfd.fd=fd;
+                            pfd.events=POLLIN;
+                            i32 poll_result=poll(&pfd,1,timeout);
+
+
+                            if(poll_result==0){
+                                throw ClientTimeoutException("Upstream server timed out ");
+                            }else if(poll_result<0){
+                                throw ClientException("Error while polling , "+std::string(strerror(errno)));
+                            }
+
+                            continue;
                    }else if (errno == ECONNRESET || errno == EBADF || errno == ENOTCONN) {
           
                          break;
@@ -203,6 +222,7 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
        ssize_t sent_bytes=0;
        
        errno=0;
+       auto start_clock=std::chrono::steady_clock::now();
        while(sent_bytes<bytes){
              ssize_t sent=send(fd,buffer.data()+sent_bytes,bytes-sent_bytes,0);
             
@@ -215,10 +235,24 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
              }
              else if(sent==-1){
                   if(errno==EAGAIN || errno==EWOULDBLOCK){
-                    /*
-                      Figure out on how to handle this
-                    */
-                    //   break;
+                            i32 timeout=calculate_remaining_time(start_clock);
+                            if(timeout==0){
+                                throw ClientTimeoutException("Server timed out sending response ");
+                            }
+
+                            struct pollfd pfd;
+                            pfd.fd=fd;
+                            pfd.events=POLLOUT;
+                            i32 poll_result=poll(&pfd,1,timeout);
+
+
+                            if(poll_result==0){
+                                throw ClientTimeoutException("Upstream server timed out ");
+                            }else if(poll_result<0){
+                                throw ClientException("Error while polling , "+std::string(strerror(errno)));
+                            }
+
+                            continue;
                   }else if(errno==EINTR){
                        continue;
                   }else{
