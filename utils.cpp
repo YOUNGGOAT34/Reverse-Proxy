@@ -56,7 +56,7 @@ void UTILS::make_client_socket_non_blocking(i32 fd){
    }
 
 
- ssize_t UTILS::recv_(i32 fd,std::string& buffer){
+ ssize_t UTILS::recv_(i32 fd,std::string& buffer,SERVER_CLIENT){
 
      
      ssize_t bytes_received=0;
@@ -218,7 +218,7 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
 }
 
 
- ssize_t UTILS::send_(i32 fd,std::string& buffer,const ssize_t bytes){
+ ssize_t UTILS::send_(i32 fd,std::string& buffer,const ssize_t bytes,SERVER_CLIENT type){
        ssize_t sent_bytes=0;
        
        errno=0;
@@ -226,8 +226,6 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
        while(sent_bytes<bytes){
              ssize_t sent=send(fd,buffer.data()+sent_bytes,bytes-sent_bytes,0);
             
-          
-
              if(sent>0){
                 
                 sent_bytes+=sent;
@@ -261,12 +259,7 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
 
              }
 
-    
-   
        }
-
-      
-       
 
        return sent_bytes;
        
