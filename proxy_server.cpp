@@ -104,7 +104,7 @@
              
               std::string request_buffer;
                
-              ssize_t received_bytes=utils.recv_(client_fd,request_buffer);
+              ssize_t received_bytes=utils.recv_(client_fd,request_buffer,UTILS::SERVER_CLIENT::SERVER);
             
               if(received_bytes==-1){
                    throw ServerException("Error receiving request from client: "+std::string(strerror(errno)));
@@ -134,7 +134,7 @@
 
                proxy_client.client(request_buffer,received_bytes,response_buffer,bytes_recved);
                
-               ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,bytes_recved);
+               ssize_t sent_bytes_to_client=utils.send_(client_fd,response_buffer,bytes_recved,UTILS::SERVER_CLIENT::SERVER);
                if(sent_bytes_to_client<0){
                   throw ClientException("Error sending response to client "+std::string(strerror(errno)));
                   }
@@ -143,14 +143,14 @@
                    
                     std::cout<<RED<<e.what()<<RESET<<"\n";
                     std::string response=utils.build_http_response(504,"Gateway Timeout");
-                    utils.send_(client_fd,response,response.size());
+                    utils.send_(client_fd,response,response.size(),UTILS::SERVER_CLIENT::CLIENT);
                     close(client_fd);
 
                }catch(const ClientException& e){
                     
                     std::cout<<RED<<e.what()<<RESET<<"\n";
                     std::string response=utils.build_http_response(504,"Bad Gateway");
-                    utils.send_(client_fd,response,response.size());
+                    utils.send_(client_fd,response,response.size(),UTILS::SERVER_CLIENT::CLIENT);
                     close(client_fd);
 
                }catch(...){

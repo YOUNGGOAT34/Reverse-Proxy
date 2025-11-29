@@ -7,7 +7,6 @@ i32 UTILS::create_socket(void){
  void UTILS::create_address(struct sockaddr_in& address,AddressType addr_type){
        memset(&address,0,sizeof(address));
 
-        //  address.sin_addr.s_addr=htonl(addr_type==AddressType::Server?INADDR_ANY:192.168.100.5);
          if(addr_type==AddressType::Server){
               address.sin_port=htons(SERVER_PORT);
               address.sin_addr.s_addr=htonl(INADDR_ANY);
@@ -16,9 +15,6 @@ i32 UTILS::create_socket(void){
                 if(inet_pton(AF_INET,"192.168.100.30",&address.sin_addr.s_addr)!=1){
                       throw NetworkException("Invalid upstream IP address "+std::string(strerror(errno)));
                 }
-
-               // address.sin_addr.s_addr=htonl(INADDR_LOOPBACK);
-
 
          }
          address.sin_family=AF_INET;
@@ -56,14 +52,13 @@ void UTILS::make_client_socket_non_blocking(i32 fd){
    }
 
 
- ssize_t UTILS::recv_(i32 fd,std::string& buffer,SERVER_CLIENT){
-
-     
-     ssize_t bytes_received=0;
-
-      std::string headers=read_headers(fd,bytes_received);
+ ssize_t UTILS::recv_(i32 fd,std::string& buffer,SERVER_CLIENT type){
     
-      std::string body=read_body(fd,headers,bytes_received);
+     ssize_t bytes_received=0;
+       
+     std::string headers=read_headers(fd,bytes_received,type);
+    
+      std::string body=read_body(fd,headers,bytes_received,type);
       std::string res=headers+body;
       buffer=std::move(res);
     
@@ -73,13 +68,11 @@ void UTILS::make_client_socket_non_blocking(i32 fd){
 
 
 
-std::string  UTILS::read_headers(i32 fd,ssize_t& total_bytes_received){
+std::string  UTILS::read_headers(i32 fd,ssize_t& total_bytes_received,SERVER_CLIENT type){
      i8 buffer[BUFFER]={0};
      std::string request_data;
 
-
-
-         auto start_clock=std::chrono::steady_clock::now();
+     auto start_clock=std::chrono::steady_clock::now();
 
      while(true){
          ssize_t received_bytes=recv(fd,buffer,BUFFER,0);
@@ -102,7 +95,12 @@ std::string  UTILS::read_headers(i32 fd,ssize_t& total_bytes_received){
                  if(errno==EAGAIN || errno==EWOULDBLOCK){
                             i32 timeout=calculate_remaining_time(start_clock);
                             if(timeout==0){
-                                throw ClientTimeoutException("Server timed out sending response ");
+                                if(type==SERVER_CLIENT::CLIENT){
+                                    throw ClientTimeoutException("Proxy Client timed out while reading headers from the upstream server");
+                                }else{
+                                    throw ServerTimeoutException("Proxy server timed out while reading headers from the client ");
+                                }
+                                
                             }
 
                             struct pollfd pfd;
@@ -112,7 +110,11 @@ std::string  UTILS::read_headers(i32 fd,ssize_t& total_bytes_received){
 
 
                             if(poll_result==0){
-                                throw ClientTimeoutException("Upstream server timed out ");
+                                if(type==SERVER_CLIENT::CLIENT){
+                                    throw ClientTimeoutException("Proxy Client timed out while reading headers from the upstream server");
+                                }else{
+                                    throw ServerTimeoutException("Proxy server timed out while reading headers from the client ");
+                                }
                             }else if(poll_result<0){
                                 throw ClientException("Error while polling , "+std::string(strerror(errno)));
                             }
@@ -135,7 +137,7 @@ std::string  UTILS::read_headers(i32 fd,ssize_t& total_bytes_received){
 }
 
 
-std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_received){
+std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_received,SERVER_CLIENT type){
     i8 buffer[BUFFER]={0};
     std::string body;
     //find content length
@@ -188,7 +190,11 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
 
                       i32 timeout=calculate_remaining_time(start_clock);
                       if(timeout==0){
-                          throw ClientTimeoutException("Server timed out sending response ");
+                           if(type==SERVER_CLIENT::CLIENT){
+                               throw ClientTimeoutException("proxy Client timed out while reading body from the upstream server ");
+                           }else{
+                               throw ServerTimeoutException("proxy Server timed out while reading body from the client ");
+                           }
                       }
 
                       struct pollfd pfd;
@@ -198,7 +204,12 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
 
 
                       if(poll_result==0){
-                          throw ClientTimeoutException("Upstream server timed out ");
+                           if(type==SERVER_CLIENT::CLIENT){
+
+                               throw ClientTimeoutException("proxy Client timed out while reading body from the upstream server ");
+                           }else{
+                               throw ServerTimeoutException("proxy Server timed out while reading body from the client ");
+                           }
                       }else if(poll_result<0){
                           throw ClientException("Error while polling , "+std::string(strerror(errno)));
                       }
@@ -235,7 +246,12 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
                   if(errno==EAGAIN || errno==EWOULDBLOCK){
                             i32 timeout=calculate_remaining_time(start_clock);
                             if(timeout==0){
-                                throw ClientTimeoutException("Server timed out sending response ");
+                                if(type==SERVER_CLIENT::CLIENT){
+
+                                    throw ClientTimeoutException("Proxy Client timed out while sending response to the upstream server ");
+                                }else{
+                                      throw ServerTimeoutException("Proxy Server timed out while sending response to the client ");
+                                }
                             }
 
                             struct pollfd pfd;
@@ -245,7 +261,12 @@ std::string UTILS::read_body(i32 fd,std::string& headers,ssize_t& total_bytes_re
 
 
                             if(poll_result==0){
-                                throw ClientTimeoutException("Upstream server timed out ");
+                                if(type==SERVER_CLIENT::CLIENT){
+
+                                    throw ClientTimeoutException("Proxy Client timed out while sending response to the upstream server ");
+                                }else{
+                                      throw ServerTimeoutException("Proxy Server timed out while sending response to the client ");
+                                }
                             }else if(poll_result<0){
                                 throw ClientException("Error while polling , "+std::string(strerror(errno)));
                             }

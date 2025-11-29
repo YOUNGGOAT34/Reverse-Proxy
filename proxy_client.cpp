@@ -4,7 +4,7 @@ void CLIENT::client(std::string& request_buffer,ssize_t& bytes,std::string& res,
         
        
         i32 proxy_client_fd= prepare_socket();
-        ssize_t sent_bytes_to_server=utils.send_(proxy_client_fd,request_buffer,bytes);
+        ssize_t sent_bytes_to_server=utils.send_(proxy_client_fd,request_buffer,bytes,UTILS::SERVER_CLIENT::CLIENT);
         
         if(sent_bytes_to_server<0){
            close(proxy_client_fd);
@@ -13,7 +13,7 @@ void CLIENT::client(std::string& request_buffer,ssize_t& bytes,std::string& res,
         
 
         
-        ssize_t bytes_recved=utils.recv_(proxy_client_fd,res);
+        ssize_t bytes_recved=utils.recv_(proxy_client_fd,res,UTILS::SERVER_CLIENT::CLIENT);
         
         // std::cout<<bytes_recved<<std::endl;
 
@@ -57,7 +57,7 @@ i32 CLIENT::prepare_socket(void){
 
              if(poll_status==0){
                  close(proxy_client_fd);
-                 throw ClientTimeoutException("Timeout connecting to upstream seever");
+                 throw ClientTimeoutException("Timeout connecting to upstream server");
              }else if(poll_status<0){
                  close(proxy_client_fd);
                  throw ClientException("Poll error on connect "+std::string(strerror(errno)));

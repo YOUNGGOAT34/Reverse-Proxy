@@ -8,6 +8,14 @@ class ServerException:public std::runtime_error{
         explicit ServerException(const std::string& message):std::runtime_error("Server Error: "+message){}
 };
 
+
+class ServerTimeoutException:public ServerException{
+      public:
+         using ServerException::ServerException;
+};
+
+
+
 class NetworkException:public std::runtime_error{
    public:
        explicit NetworkException(const std::string& message):std::runtime_error("Network Error: "+message){}
